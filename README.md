@@ -1,7 +1,12 @@
 # 2022夏季学期大作业
 
-**项目名称：** 未确定
+**项目名称：** Thide
 
-**项目Logo：** 未确定
+**项目Logo：** ![](./doc/images/logo.png)
 
-**其他：** 暂无
+**小型Logo：** ![](./doc/images/small_logo.png)
+
+**其他：**
+* [文档部分README](./doc/README.md)
+* [前端代码部分README](./frontend/README.md)
+* [后端代码部分README](./backend/README.md)
