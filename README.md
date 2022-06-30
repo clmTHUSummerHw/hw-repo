@@ -6,6 +6,9 @@
 
 **小型Logo：** ![](./doc/images/small_logo.png)
 
+**小组成员：**
+* 刘子骜
+
 **其他：**
 * [文档部分README](./doc/README.md)
 * [前端代码部分README](./frontend/README.md)
