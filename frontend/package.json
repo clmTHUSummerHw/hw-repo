@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "element-plus": "^2.2.8",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.3",
@@ -30,7 +31,9 @@
     "eslint-plugin-vue": "^8.0.3",
     "eslint-plugin-vuejs-accessibility": "^1.1.0",
     "lint-staged": "^11.1.2",
-    "typescript": "~4.5.5"
+    "typescript": "~4.5.5",
+    "unplugin-auto-import": "^0.9.2",
+    "unplugin-vue-components": "^0.21.0"
   },
   "eslintConfig": {
     "root": true,
@@ -39,13 +42,15 @@
     },
     "extends": [
       "plugin:vue/vue3-essential",
-      "@vue/airbnb",
       "@vue/typescript/recommended"
     ],
     "parserOptions": {
       "ecmaVersion": 2020
     },
-    "rules": {}
+    "rules": {
+      "vue/multi-word-component-names": "warn",
+      "@typescript-eslint/no-extra-semi": "warn"
+    }
   },
   "browserslist": [
     "> 1%",
