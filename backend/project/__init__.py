@@ -1,11 +1,11 @@
 from flask import Blueprint
-from list_files import list_files
-from new_file import new_file
-from delete_file import delete_file
-from new_folder import new_folder
-from delete_folder import delete_folder
-from upload_file import upload_file
-from download_file import download_file
+from project.list_files import list_files
+from project.new_file import new_file
+from project.delete_file import delete_file
+from project.new_folder import new_folder
+from project.delete_folder import delete_folder
+from project.upload_file import upload_file
+from project.download_file import download_file
 
 
 project_api = Blueprint('project', __name__)

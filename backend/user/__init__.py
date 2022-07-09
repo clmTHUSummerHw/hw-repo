@@ -1,11 +1,10 @@
-from crypt import methods
 from flask import Blueprint
-from register import register
-from login import login
-from logout import logout
-from list_projects import list_projects
-from new_project import new_project
-from delete_project import delete_project
+from user.register import register
+from user.login import login
+from user.logout import logout
+from user.list_projects import list_projects
+from user.new_project import new_project
+from user.delete_project import delete_project
 
 
 user_api = Blueprint('user', __name__)
