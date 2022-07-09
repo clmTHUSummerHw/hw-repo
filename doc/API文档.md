@@ -156,7 +156,7 @@
 
 ## 删除项目
 
-**接口：** `[POST] /user/new-project`
+**接口：** `[POST] /user/delete-project`
 
 **请求：** json对象，具体格式为：
 ```json
