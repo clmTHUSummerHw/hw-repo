@@ -1,11 +1,17 @@
 # frontend
 
-# 前端部分调用Element Plus，需以如下命令进行安装：
- $ npm install element-plus --save
+## 前端部分调用Element Plus，需以如下命令进行安装：
+'''
+ npm install element-plus --save
+'''
   or
- $ yarn add element-plus
+'''
+ yarn add element-plus
+'''
   or
- $ pnpm install element-plus
+'''
+ pnpm install element-plus
+'''
 
 ## Project setup
 ```
