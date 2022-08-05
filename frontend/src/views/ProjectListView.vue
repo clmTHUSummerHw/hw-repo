@@ -16,7 +16,7 @@
                     <el-tag class="ml-2" type="success" v-if="isLogin">已登录</el-tag>
                     <el-tag class="ml-2" type="danger" v-else>未登录</el-tag>
                 </div>
-                <!--todo: 展示用户详细信息-->
+                <!--TODO: 展示用户详细信息-->
             </el-header>
 
             <el-main>
@@ -52,9 +52,9 @@ export default defineComponent({
         }
     },
 
-    mounted()
+    mounted() //如需要使用async，直接把这里改为async mounted()
     {
-        //TODO: 加载用户信息及项目信息
+        //TODO: 加载用户信息及项目信息（从vuex加载一部分，通过post请求获得另一部分）（尽量使用async，不要嵌套回调函数）
     }
 })
 </script>

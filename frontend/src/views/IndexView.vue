@@ -76,7 +76,7 @@ export default defineComponent({
             try
             {
                 let result = await axios.post('/user/login', JSON.stringify(this.form)) as LoginResult;
-                //TODO: 处理请求结果
+                //TODO: 处理请求结果，用户名和session保存在vuex中
                 return;
             }
             catch (e)
