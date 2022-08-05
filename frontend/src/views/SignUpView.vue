@@ -74,7 +74,7 @@ export default defineComponent({
                     { validator: validatePassword, trigger: 'blur' }
                 ],
                 passwordCheck: [
-                    { validator: validatePasswordCheck(this.form), trigger: 'blur' }
+                    { validator: validatePasswordCheck(this.$data.form), trigger: 'blur' }
                 ]
             }
         }
