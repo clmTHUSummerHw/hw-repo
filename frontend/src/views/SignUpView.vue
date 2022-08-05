@@ -50,7 +50,7 @@ import { FormInstance } from 'element-plus';
 import RegisterResult from '@/utils/post-util/RegisterResult';
 
 export default defineComponent({
-    name: 'signUp',
+    name: 'SignUpView',
     data()
     {
         return {
@@ -74,7 +74,7 @@ export default defineComponent({
                     { validator: validatePassword, trigger: 'blur' }
                 ],
                 passwordCheck: [
-                    { validator: validatePasswordCheck(this.$data.form), trigger: 'blur' }
+                    { validator: validatePasswordCheck((this as any).form), trigger: 'blur' } //TODO: 我不理解！为什么这里写this.form会报错？？谁能界解决它吗？（不解决也可以，现在运行很正常）
                 ]
             }
         }

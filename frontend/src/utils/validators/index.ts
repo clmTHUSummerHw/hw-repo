@@ -39,8 +39,11 @@ export const validatePassword = (_rule: any, value: string, callback: (arg0?: an
 };
 
 //自定义二次密码输入验证器
-export const validatePasswordCheck = (form: { username: string; password: string; passwordCheck: string; }) =>
+export const validatePasswordCheck = (form?: { username?: string; password: string; passwordCheck?: string; }) =>
 {
+    if(form == null)
+        return {};
+
     return (_rule: any, value: string, callback: (arg0?: any) => any) =>
     {
         if (value === '')
