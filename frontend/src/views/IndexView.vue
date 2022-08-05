@@ -20,7 +20,7 @@
 
                 <!--提交按钮表单元素-->
                 <el-form-item>
-                    <el-button class="submit" type="primary" @click="submitForm('Form')" round>登录</el-button>
+                    <el-button class="submit" type="primary" @click="submitForm" round>登录</el-button>
                     <!--round只是设置形状-->
                 </el-form-item>
             </el-form>
@@ -36,53 +36,14 @@
 <script lang="ts">
 import axios from 'axios';
 import { FormInstance } from 'element-plus';
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import LoginResult from '@/utils/post-util/LoginResult';
+import { validateUsername, validatePassword } from '@/utils/validators';
 
 export default defineComponent({
-    name: 'indexPage',
+    name: 'IndexView',
     data()
     {
-        //自定义用户名输入验证器
-        const validateUsername = (_rule: any, value: string, callback: (arg0?: any) => any) =>
-        {
-            if (!value)
-            {
-                return callback(new Error("用户名不能为空"))
-            }
-            else
-            {
-                let cur_reg = new RegExp("^[a-zA-Z_]"); //匹配字母或下划线的正则表达式
-                if (value.length < 2)
-                { //输入用户名长度小于2
-                    return callback(new Error("用户名长度至少应为2个字符"));
-                }
-                else if (value.length > 16)
-                { //输入用户名长度大于16
-                    return callback(new Error("用户名长度至多为16个字符"));
-                }
-                else if (!(cur_reg.test(value))) //输入用户名不是字母开头或下划线
-                {
-                    return callback(new Error('用户名的第一个字符应为字母'));
-                }
-                else
-                    callback();
-            }
-        };
-
-        //自定义密码输入验证器
-        const validatePassword = (_rule: any, value: string, callback: (arg0?: any) => any) =>
-        {
-            if (!value)
-            { //检查密码是否为空
-                return callback(new Error("密码不能为空"))
-            }
-            else
-            {
-                callback();
-            }
-        };
-
         return {
             form: { // 用户名、密码表单提交内容
                 username: "",
@@ -100,9 +61,9 @@ export default defineComponent({
         };
     },
     methods: {
-        async submitForm(formName: string)
+        async submitForm()
         {
-            let form: FormInstance = this.$refs['form'] as FormInstance;
+            let form = this.$refs['form'] as FormInstance;
             let valid = await form.validate();
 
             if (!valid)
@@ -114,15 +75,9 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post('/user/login', JSON.stringify(this.form));
-                if (LoginResult.validate(result))
-                {
-                    console.log(JSON.stringify(result)); //TODO: 处理请求结果
-                }
-                else
-                {
-                    console.log(JSON.stringify(result)); //TODO: 处理特殊异常（一般应该不会出现，可简单处理）
-                }
+                let result = await axios.post('/user/login', JSON.stringify(this.form)) as LoginResult;
+                //TODO: 处理请求结果
+                return;
             }
             catch (e)
             {
