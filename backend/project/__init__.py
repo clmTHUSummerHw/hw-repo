@@ -10,10 +10,10 @@ from project.download_file import download_file
 
 project_api = Blueprint('project', __name__)
 
-project_api.add_url_rule('/', 'list-files', list_files, methods=['POST'])
-project_api.add_url_rule('/', 'new-file', new_file, methods=['POST'])
-project_api.add_url_rule('/', 'delete-file', delete_file, methods=['POST'])
-project_api.add_url_rule('/', 'new-folder', new_folder, methods=['POST'])
-project_api.add_url_rule('/', 'delete-folder', delete_folder, methods=['POST'])
-project_api.add_url_rule('/', 'upload-file', upload_file, methods=['POST'])
-project_api.add_url_rule('/', 'download-file', download_file, methods=['POST'])
+project_api.add_url_rule('/list-files', view_func=list_files, methods=['POST'])
+project_api.add_url_rule('/new-file', view_func=new_file, methods=['POST'])
+project_api.add_url_rule('/delete-file', view_func=delete_file, methods=['POST'])
+project_api.add_url_rule('/new-folder', view_func=new_folder, methods=['POST'])
+project_api.add_url_rule('/delete-folder', view_func=delete_folder, methods=['POST'])
+project_api.add_url_rule('/upload-file', view_func=upload_file, methods=['POST'])
+project_api.add_url_rule('/download-file', view_func=download_file, methods=['POST'])

@@ -1,4 +1,4 @@
 from flask import request
 
 def logout():
-    pass
+    pass# TODO: 释放session
