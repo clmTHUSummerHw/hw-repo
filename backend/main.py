@@ -12,7 +12,6 @@ db.init_app(app)
 
 app.register_blueprint(user_api, url_prefix='/user')
 app.register_blueprint(project_api, url_prefix='/project')
-app.add_url_rule('/test', view_func=test, methods=['POST'])
 
 
 if __name__ == '__main__':
