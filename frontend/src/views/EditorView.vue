@@ -86,7 +86,13 @@ export default defineComponent({
   props: {
     session: {
       type: String,
+      required: false, //本地项目
+      default: "sessionid",
+    },
+    project: {
+      type: String,
       required: false,
+      default: "project_name",
     },
   },
 
@@ -143,11 +149,18 @@ export default defineComponent({
       for (var i = 0; i < files.length; i++) {
         var tree = {};
         tree["label"] = files[i]["name"];
+        tree["folder"] = files[i]["folder"];
         if (files[i]["folder"] == 1) {
           tree["children"] = this.list2tree(files[i]["files"]);
         }
         tree_arr.push(tree);
       }
+      function objectSort(firstproperty) {
+        return function (Obj1, Obj2) {
+          return Obj2[firstproperty] - Obj1[firstproperty];
+        };
+      } //令文件夹展示在前面
+      tree_arr.sort(objectSort("folder"));
       return tree_arr;
     },
     refreshlist() {
@@ -155,8 +168,8 @@ export default defineComponent({
         .post(
           "http://127.0.0.1:4523/m1/1454888-0-default/project/list-files",
           JSON.stringify({
-            session: "1",
-            project: "a",
+            session: this.session, //把props里接受session发送到后端
+            project: this.project,
           })
         )
         .then((resp) => {
