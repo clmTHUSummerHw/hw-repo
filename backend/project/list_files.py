@@ -1,5 +1,7 @@
-from flask import request
+from flask import jsonify, request
 
 
 def list_files():
-    pass
+    file = open('local/projects/test.txt')
+    str = file.readlines()
+    return jsonify({"str": str})
