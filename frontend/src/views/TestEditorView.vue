@@ -1,6 +1,9 @@
 <template>
     <div class="test-editor-view">
-        <MonacoEditor></MonacoEditor>
+        <MonacoEditor v-model="text"></MonacoEditor>
+    </div>
+    <div>
+        <input type="text" v-model="text">
     </div>
 </template>
 
@@ -11,6 +14,12 @@ import MonacoEditor from '@/components/MonacoEditor.vue';
 export default defineComponent({
     components: {
         MonacoEditor
+    },
+    data()
+    {
+        return {
+            text: "Test text"
+        }
     }
 })
 </script>
@@ -18,7 +27,7 @@ export default defineComponent({
 <style lang="scss">
 .test-editor-view
 {
-    width: 100vw;
-    height: 100vh;
+    width: 75vw;
+    height: 75vh;
 }
 </style>
