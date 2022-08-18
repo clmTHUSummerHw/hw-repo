@@ -6,10 +6,7 @@
 import * as monaco from "monaco-editor";
 import { defineComponent } from "vue";
 
-class Data
-{
-    editor: monaco.editor.IStandaloneCodeEditor | undefined = undefined;
-}
+let editor: monaco.editor.IStandaloneCodeEditor | undefined = undefined;
 
 export default defineComponent({
     props: {
@@ -22,49 +19,83 @@ export default defineComponent({
     ],
     data()
     {
-        return new Data();
+        return {
+            edited: false,
+            reloaded: false,
+            inMount: false
+        }
     },
     mounted()
     {
-        console.log("mounted");
+        this.inMount = true;
+
         let container = this.$refs['editor-container'] as HTMLElement;
-        this.editor = monaco.editor.create(container, {language: this.language, value: "-"});
+        editor = monaco.editor.create(container, { language: this.language, value: "-" });
 
-        this.editor.onDidChangeModelContent(this.onModelContentChange, this);
+        editor.onDidChangeModelContent(this.onModelContentChange, this);
 
-        if(this.modelValue != null)
+        if (this.modelValue != null)
         {
-            console.log(this.modelValue);
-            //this.editor.setValue(this.modelValue);
-            console.log('setValue');
+            this.setEditorText(this.modelValue);
         }
+
+        this.inMount = false;
+    },
+    unmounted()
+    {
+        editor?.dispose();
     },
     methods: {
         onModelContentChange(event: monaco.editor.IModelContentChangedEvent)
         {
             console.log("onModelContentChange");
             let text = this.modelValue;
-            if(text == null)
+            if (text == null)
                 return;
-            for(let change of event.changes)
+            for (let change of event.changes)
             {
                 let t1 = text.substring(0, change.rangeOffset);
                 let t2 = change.text;
                 let t3 = text.substring(change.rangeOffset + change.rangeLength + 1, text.length);
-                this.$emit('update:modelValue', t1 + t2 + t3);
+
+                this.emitUpdate(t1 + t2 + t3);
             }
+        },
+
+        emitUpdate(value: string)
+        {
+            if(this.inMount)
+                return;
+
+            if (!this.reloaded)
+                this.edited = true;
+            else
+                this.reloaded = false;
+
+            this.$emit('update:modelValue', value);
+        },
+
+        setEditorText(value: string)
+        {
+            if(this.inMount)
+            {
+                editor?.setValue(value);
+                return;
+            }
+
+            if (!this.edited)
+            {
+                this.reloaded = true;
+                editor?.setValue(value);
+            }
+            else
+                this.edited = false;
         }
     },
     watch: {
-        modelValue(newValue: string, oldValue: string)
+        modelValue(newValue: string, _oldValue: string)
         {
-            console.log("watchModelValue");
-            if(newValue != oldValue)
-            {
-                console.log(newValue);
-                this.editor?.setValue(newValue);
-                console.log('setValue');
-            }
+            this.setEditorText(newValue);
         }
     }
 })

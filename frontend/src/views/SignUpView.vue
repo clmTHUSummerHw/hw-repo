@@ -46,8 +46,8 @@
 import axios from 'axios';
 import { defineComponent } from 'vue';
 import { validateUsername, validatePassword, validatePasswordCheck } from '@/utils/validators';
-import { FormInstance } from 'element-plus';
-import RegisterResult from '@/utils/post-util/RegisterResult';
+import type { FormInstance } from 'element-plus/es/components/form/index';
+import type RegisterResult from '@/utils/post-util/RegisterResult';
 
 export default defineComponent({
     name: 'SignUpView',

@@ -1,5 +1,5 @@
 <template>
-    <!--TODO: 把编辑器拆分为多个组件，使用vuex共享状态-->
+    <!--TODO: 把编辑器拆分为多个组件，使用pinia共享状态-->
     <div id="editor">
         <el-container id="BOX_BASE">
             <!--最高级容器-->

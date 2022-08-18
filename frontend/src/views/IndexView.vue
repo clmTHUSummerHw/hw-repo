@@ -35,9 +35,9 @@
 
 <script lang="ts">
 import axios from 'axios';
-import { FormInstance } from 'element-plus';
+import type { FormInstance } from 'element-plus/es/components/form/index';
 import { defineComponent } from 'vue';
-import LoginResult from '@/utils/post-util/LoginResult';
+import type LoginResult from '@/utils/post-util/LoginResult';
 import { validateUsername, validatePassword } from '@/utils/validators';
 
 export default defineComponent({
@@ -76,7 +76,7 @@ export default defineComponent({
             try
             {
                 let result = await axios.post('/user/login', JSON.stringify(this.form)) as LoginResult;
-                //TODO: 处理请求结果，用户名和session保存在vuex中
+                //TODO: 处理请求结果，用户名和session保存在pinia中
                 return;
             }
             catch (e)
