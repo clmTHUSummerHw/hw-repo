@@ -1,8 +1,8 @@
 from random import random
 from flask import request, jsonify
 from db.models import User
-from user_dict import UserDict
-from user_dict import joindict
+from user.user_dict import UserDict
+from user.user_dict import joindict
 
 def login(): # 处理登录请求，创建session
 
