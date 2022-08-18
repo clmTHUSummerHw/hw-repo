@@ -7,8 +7,8 @@ class UserInfo():
         pass
 
 
-UserDict = {}  # session: userinfo(class UserInfo)
+user_dict = {}  # session: userinfo(class UserInfo)
 
 def joindict(session = str, username = str):
-    UserDict[session] = UserInfo(username)
+    user_dict[session] = UserInfo(username)
 

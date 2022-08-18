@@ -1,8 +1,8 @@
-from random import random
+import random
 from flask import request, jsonify
 from db.models import User
-from user.user_dict import UserDict
-from user.user_dict import joindict
+from user.user_dict import user_dict, joindict
+
 
 def login(): # 处理登录请求，创建session
 
@@ -17,7 +17,7 @@ def login(): # 处理登录请求，创建session
 
 
     user = User.query.filter_by(username=username).first()
-    
+
     if user is None: # 若数据库中查询不到该用户，返回2（用户不存在）
         return jsonify({'code': 2, 'session': '@Y@'})
 
@@ -25,13 +25,13 @@ def login(): # 处理登录请求，创建session
         return jsonify({'code': 1, 'session': 'Orz'})
 
     session = get_random_str()
-    while session in UserDict:
+    while session in user_dict:
         session = get_random_str()
 
     joindict(session, username)
     return jsonify({'code':0, 'session': session}) # 返回0（登录成功）
 
-    
+
 
 def get_random_str(): # 生成16字节长的session，仅包含字母和数字，且区分大小写
     random_str = ''
