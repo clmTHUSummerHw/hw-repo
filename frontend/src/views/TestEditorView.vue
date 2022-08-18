@@ -1,6 +1,6 @@
 <template>
     <div class="test-editor-view">
-        <MonacoEditor v-model="text" file="test"></MonacoEditor>
+        <MonacoEditor v-model="text" file="test" language="java"></MonacoEditor>
     </div>
     <div>
         <input type="text" v-model="text">
