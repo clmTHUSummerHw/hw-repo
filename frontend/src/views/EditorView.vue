@@ -21,8 +21,10 @@
             <template #title>文件</template>
             <el-menu-item index="1-1">新建文件</el-menu-item>
             <el-menu-item index="1-2">新建文件夹</el-menu-item>
-            <el-menu-item index="1-3">删除文件</el-menu-item>
-            <el-menu-item index="1-4">删除文件夹</el-menu-item>
+            <el-menu-item index="1-3">上传文件</el-menu-item>
+            <el-menu-item index="1-4">下载文件</el-menu-item>
+            <el-menu-item index="1-5">保存文件</el-menu-item>
+            <el-menu-item index="1-6">删除</el-menu-item>
           </el-sub-menu>
 
           <!--编辑栏目-->
@@ -37,10 +39,35 @@
           </el-menu-item>
         </el-menu>
       </el-header>
-      <el-container>
+      <el-container id="content">
         <el-aside id="BOX_PROJECT_FILE_LIST">
+          <div class="uploadhide">
+            <el-upload
+              ref="upload"
+              :auto-upload="false"
+              :on-change="uploadFile"
+              :show-file-list="false"
+            >
+              <template #trigger>
+                <el-button type="primary" class="uploadButton"
+                  >select file</el-button
+                >
+              </template>
+            </el-upload>
+          </div>
+          <el-menu
+            mode="vertical"
+            v-show="menuVisible"
+            class="contextmenu"
+            @select="handleContextmenu"
+          >
+            <el-menu-item index="1">新建文件</el-menu-item>
+            <el-menu-item index="2">新建文件夹</el-menu-item>
+            <!--包括删除文件和删除文件夹-->
+            <el-menu-item index="3">删除</el-menu-item>
+            <el-menu-item index="4">下载文件</el-menu-item>
+          </el-menu>
           <!--当前项目文件栏-->
-
           <el-tree
             ref="tree"
             :data="treeData"
@@ -49,6 +76,7 @@
             :default-expanded-keys="expandedTreeId"
             @node-click="handleNodeClick"
             highlight-current="true"
+            @node-contextmenu="handleNodeContextmenu"
           >
             <template #default="{ node, data }">
               <img
@@ -75,22 +103,18 @@
             type="border-card"
             editable
             @edit="handleTabsEdit"
+            @tab-change="handleTabChange"
             closable
           >
             <!--editable提供添加tab的按钮 / closable提供可关闭tab的按钮-->
-
-            <!--默认打开的tab，展示向导文件-->
-            <el-tab-pane label="WELCOME" name="first">
-              WELCOME TAB TO show README DOC
-            </el-tab-pane>
-
-            <!--默认提供的编辑器tab-->
-            <el-tab-pane label="EDITOR_PAGE" name="second">
-              <el-input
-                v-model="editorText"
-                type="textarea"
-                rows="20"
-              ></el-input>
+            <el-tab-pane
+              v-for="item in editableTabs"
+              :key="item.name"
+              :label="item.title"
+              :name="item.name"
+            >
+              <el-input v-model="item.content" type="textarea" rows="20">
+              </el-input>
             </el-tab-pane>
           </el-tabs>
         </el-main>
@@ -123,10 +147,22 @@ export default defineComponent({
 
   data() {
     return {
-      active_index: "1", //目前展开的菜单选项index
-      active_name: "", //目前展示的编辑器区域文件名
-      treeData: [], //TODO: 抓取并引入项目文件夹结构
+      active_name: "first", //目前展示的编辑器区域文件名(tap_name)
+      editableTabs: [
+        {
+          title: "WELCOME",
+          name: "first",
+          content: "WELCOME TAB TO show README DOC",
+        },
+        {
+          title: "EDITOR_PAGE",
+          name: "second",
+          content: "EDITOR_PAGE content",
+        },
+      ], //打开的所有tap,title与文件名关联，name与文件的id关联
       editorText: "", //默认编辑器tab的输入内容
+
+      treeData: [], //TODO: 抓取并引入项目文件夹结构
       treeProps: {
         label: "name",
         children: "files",
@@ -135,6 +171,8 @@ export default defineComponent({
       expandedTreeId: [1], //key is name,1 is project's treeid
       currentTreeNode: null, //默认是project的treenode
       maxTreeId: 0,
+      menuVisible: false,
+      ContextmenuNode: null, //右键菜单选择的节点
     };
   },
   mounted() {
@@ -143,9 +181,118 @@ export default defineComponent({
     }, 100);
   },
   methods: {
+    uploadFile(file, fileList) {
+      this.getBase64(file.raw).then((result) => {
+        var currentTreeNode = this.currentTreeNode;
+        if (currentTreeNode == null) {
+          currentTreeNode = this.$refs.tree.getNode(1);
+        } //如果是null即为根目录project_name
+        var filepath = this.getCurrentFilePath(currentTreeNode) + file["name"];
+        axios
+          .post(
+            "http://127.0.0.1:4523/m1/1454888-0-default/project/upload-file",
+            JSON.stringify({
+              session: this.session, //把props里接受session发送到后端
+              project: this.project,
+              name: filepath,
+              file: result,
+            })
+          )
+          .then((resp) => {
+            if (resp["data"]["code"] == 0) {
+              this.maxTreeId = this.maxTreeId + 1;
+              var childdata = {
+                name: file["name"],
+                id: this.maxTreeId,
+                folder: 0,
+              };
+              if (currentTreeNode["data"]["folder"] == 1) {
+                this.$refs.tree.append(childdata, currentTreeNode);
+              } else {
+                this.$refs.tree.append(childdata, currentTreeNode["parent"]);
+              }
+              this.focusTreeNode(this.$refs.tree.getNode(this.maxTreeId));
+            } else if (resp["data"]["code"] == 1) {
+              alert("session无效");
+            } else if (resp["data"]["code"] == 2) {
+              alert("项目不存在");
+            } else if (resp["data"]["code"] == 3) {
+              alert("文件名不符合规范");
+            } else if (resp["data"]["code"] == 4) {
+              alert("文件已存在");
+            } else {
+              alert("未知错误");
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      });
+    },
+    getBase64(file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      let result = "";
+      return new Promise(function (resolve, reject) {
+        reader.onload = function () {
+          result = reader.result.split(",")[1];
+        };
+        reader.onloadend = function () {
+          resolve(result);
+        };
+      });
+    },
+    downloadFile(currentTreeNode) {
+      if (currentTreeNode == null) {
+        alert("请选择要下载的文件");
+      } else if (currentTreeNode["data"]["folder"] == 1) {
+        alert("暂不支持下载文件夹");
+      } else {
+        var filepath =
+          this.getCurrentFilePath(currentTreeNode) +
+          currentTreeNode["data"]["name"];
+        axios
+          .post(
+            "http://127.0.0.1:4523/m1/1454888-0-default/project/download-file",
+            JSON.stringify({
+              session: this.session, //把props里接受session发送到后端
+              project: this.project,
+              name: filepath,
+            })
+          )
+          .then((resp) => {
+            if (resp["data"]["code"] == 0) {
+              var elementA = document.createElement("a"); // 创建a标签
+              elementA.download = currentTreeNode["data"]["name"]; //文件的名称
+              elementA.style.display = "none";
+              var blob = new Blob([atob(resp["data"]["file"])]); //生成一个blob二进制数据，内容为从后端获得的文件内容
+              elementA.href = URL.createObjectURL(blob);
+              document.body.appendChild(elementA);
+              elementA.click();
+              document.body.removeChild(elementA);
+            } else if (resp["data"]["code"] == 1) {
+              alert("session无效");
+            } else if (resp["data"]["code"] == 2) {
+              alert("项目不存在");
+            } else if (resp["data"]["code"] == 3) {
+              alert("文件不存在");
+            } else if (resp["data"]["code"] == 4) {
+              alert("路径为文件夹而非文件");
+            } else {
+              alert("未知错误");
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+    },
     getCurrentFilePath(currentTreeNode) {
       var filepath = "";
-      if (currentTreeNode["data"]["name"] != this.project) {
+      if (
+        currentTreeNode != null &&
+        currentTreeNode["data"]["name"] != this.project
+      ) {
         //如果project_name即为根目录"sessionid//projectname//filename"
         filepath =
           filepath + this.getCurrentFilePath(currentTreeNode["parent"]);
@@ -155,11 +302,11 @@ export default defineComponent({
       }
       return filepath;
     },
-    createFile(filename) {
-      if (this.currentTreeNode == null) {
-        this.currentTreeNode = this.$refs.tree.getNode(1);
+    createFile(currentTreeNode, filename) {
+      if (currentTreeNode == null) {
+        currentTreeNode = this.$refs.tree.getNode(1);
       } //如果是null即为根目录project_name
-      var filepath = this.getCurrentFilePath(this.currentTreeNode) + filename;
+      var filepath = this.getCurrentFilePath(currentTreeNode) + filename;
       axios
         .post(
           "http://127.0.0.1:4523/m1/1454888-0-default/project/new-file",
@@ -177,17 +324,14 @@ export default defineComponent({
               id: this.maxTreeId,
               folder: 0,
             };
-            if (this.currentTreeNode["data"]["folder"] == 1) {
-              this.$refs.tree.append(childdata, this.currentTreeNode);
+            if (currentTreeNode["data"]["folder"] == 1) {
+              this.$refs.tree.append(childdata, currentTreeNode);
             } else {
-              this.$refs.tree.append(childdata, this.currentTreeNode["parent"]);
+              this.$refs.tree.append(childdata, currentTreeNode["parent"]);
             }
-            this.currentTreeNode = this.$refs.tree.getNode(this.maxTreeId);
-            this.focusTreeNode(this.currentTreeNode);
-            ElMessage({
-              type: "success",
-              message: `已创建文件:${filename}`,
-            });
+            this.focusTreeNode(this.$refs.tree.getNode(this.maxTreeId));
+            //在右侧新增tab
+            this.addTab(filename, `${this.maxTreeId}`, "");
           } else if (resp["data"]["code"] == 1) {
             alert("session无效");
           } else if (resp["data"]["code"] == 2) {
@@ -204,11 +348,11 @@ export default defineComponent({
           console.log(error);
         });
     },
-    createFolder(foldername) {
-      if (this.currentTreeNode == null) {
-        this.currentTreeNode = this.$refs.tree.getNode(1);
+    createFolder(currentTreeNode, foldername) {
+      if (currentTreeNode == null) {
+        currentTreeNode = this.$refs.tree.getNode(1);
       }
-      var filepath = this.getCurrentFilePath(this.currentTreeNode) + foldername;
+      var filepath = this.getCurrentFilePath(currentTreeNode) + foldername;
       axios
         .post(
           "http://127.0.0.1:4523/m1/1454888-0-default/project/new-folder",
@@ -226,17 +370,12 @@ export default defineComponent({
               id: this.maxTreeId,
               folder: 1,
             };
-            if (this.currentTreeNode["data"]["folder"] == 1) {
-              this.$refs.tree.append(childdata, this.currentTreeNode);
+            if (currentTreeNode["data"]["folder"] == 1) {
+              this.$refs.tree.append(childdata, currentTreeNode);
             } else {
-              this.$refs.tree.append(childdata, this.currentTreeNode["parent"]);
+              this.$refs.tree.append(childdata, currentTreeNode["parent"]);
             }
-            this.currentTreeNode = this.$refs.tree.getNode(this.maxTreeId);
-            this.focusTreeNode(this.currentTreeNode);
-            ElMessage({
-              type: "success",
-              message: `已创建文件夹:${foldername}`,
-            });
+            this.focusTreeNode(this.$refs.tree.getNode(this.maxTreeId));
           } else if (resp["data"]["code"] == 1) {
             alert("session无效");
           } else if (resp["data"]["code"] == 2) {
@@ -253,7 +392,7 @@ export default defineComponent({
           console.log(error);
         });
     },
-    createFileMessageBox() {
+    createFileMessageBox(currentTreeNode) {
       ElMessageBox.prompt("Please input your file name", "新建文件", {
         confirmButtonText: "OK",
         cancelButtonText: "Cancel",
@@ -261,7 +400,7 @@ export default defineComponent({
         inputErrorMessage: "请输入正确的文件名",
       })
         .then(({ value }) => {
-          this.createFile(value);
+          this.createFile(currentTreeNode, value);
         })
         .catch(() => {
           ElMessage({
@@ -270,7 +409,7 @@ export default defineComponent({
           });
         });
     },
-    createFolderMessageBox() {
+    createFolderMessageBox(currentTreeNode) {
       ElMessageBox.prompt("Please input your folder name", "新建文件夹", {
         confirmButtonText: "OK",
         cancelButtonText: "Cancel",
@@ -278,7 +417,7 @@ export default defineComponent({
         inputErrorMessage: "请输入正确的文件夹名",
       })
         .then(({ value }) => {
-          this.createFolder(value);
+          this.createFolder(currentTreeNode, value);
         })
         .catch(() => {
           ElMessage({
@@ -287,8 +426,8 @@ export default defineComponent({
           });
         });
     },
-    deleteFile() {
-      var filepath = this.getCurrentFilePath(this.currentTreeNode);
+    deleteFile(currentTreeNode) {
+      var filepath = this.getCurrentFilePath(currentTreeNode);
       axios
         .post(
           "http://127.0.0.1:4523/m1/1454888-0-default/project/delete-file",
@@ -300,9 +439,13 @@ export default defineComponent({
         )
         .then((resp) => {
           if (resp["data"]["code"] == 0) {
-            this.$refs.tree.remove(this.currentTreeNode);
+            this.$refs.tree.remove(currentTreeNode);
             this.currentTreeNode = this.$refs.tree.getNode(1);
-            //TODO:删除tap
+            this.editableTabs.forEach((tab) => {
+              if (tab.title === currentTreeNode["data"]["name"]) {
+                this.removeTab(tab.name);
+              }
+            }); //如果之前已打开tab，还要删除tab
           } else if (resp["data"]["code"] == 1) {
             alert("session无效");
           } else if (resp["data"]["code"] == 2) {
@@ -319,12 +462,12 @@ export default defineComponent({
           console.log(error);
         });
     },
-    deleteFolder() {
+    deleteFolder(currentTreeNode) {
       //不能删项目根目录
-      if (this.currentTreeNode["data"]["id"] == 1) {
+      if (currentTreeNode["data"]["id"] == 1) {
         alert("不可删除项目根目录");
       } else {
-        var filepath = this.getCurrentFilePath(this.currentTreeNode);
+        var filepath = this.getCurrentFilePath(currentTreeNode);
         axios
           .post(
             "http://127.0.0.1:4523/m1/1454888-0-default/project/delete-folder",
@@ -336,16 +479,15 @@ export default defineComponent({
           )
           .then((resp) => {
             if (resp["data"]["code"] == 0) {
-              this.$refs.tree.remove(this.currentTreeNode);
+              this.$refs.tree.remove(currentTreeNode);
               //如果是文件夹，还要移除默认展开列表
               var treeIndex = this.expandedTreeId.findIndex((item) => {
-                return item == this.currentTreeNode["data"]["id"];
+                return item == currentTreeNode["data"]["id"];
               });
               if (treeIndex != -1) {
                 this.expandedTreeId.splice(treeIndex, 1);
               }
               this.currentTreeNode = this.$refs.tree.getNode(1); //只记录不focus
-              //TODO:删除tap
             } else if (resp["data"]["code"] == 1) {
               alert("session无效");
             } else if (resp["data"]["code"] == 2) {
@@ -363,37 +505,177 @@ export default defineComponent({
           });
       }
     },
-    handleMenuSelect(key, keyPath) {
-      //应对菜单选择
-      //console.log(key);
-      if (key == "1-1") {
-        this.createFileMessageBox();
-      } else if (key == "1-2") {
-        this.createFolderMessageBox();
-      } else if (key == "1-3") {
-        this.deleteFile();
-      } else if (key == "1-4") {
-        this.deleteFolder();
+    saveFile(currentTreeNode) {
+      if (currentTreeNode == null) {
+        alert("请选择要保存的文件");
+      } else {
+        var pane = document.getElementById(`pane-${this.active_name}`);
+        var filecontent = pane.getElementsByTagName("textarea")[0].value;
+        var filepath =
+          this.getCurrentFilePath(currentTreeNode) +
+          currentTreeNode["data"]["name"];
+        axios
+          .post(
+            "http://127.0.0.1:4523/m1/1454888-0-default/project/upload-file",
+            JSON.stringify({
+              session: this.session, //把props里接受session发送到后端
+              project: this.project,
+              name: filepath,
+              file: filecontent,
+            })
+          )
+          .then((resp) => {
+            if (resp["data"]["code"] == 0) {
+              ElMessage({
+                type: "success",
+                message: "保存成功",
+              });
+            } else if (resp["data"]["code"] == 1) {
+              alert("session无效");
+            } else if (resp["data"]["code"] == 2) {
+              alert("项目不存在");
+            } else if (resp["data"]["code"] == 3) {
+              alert("文件名不符合规范");
+            } else if (resp["data"]["code"] == 4) {
+              alert("文件已存在");
+            } else {
+              alert("未知错误");
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
       }
     },
-    /*handleClick(tab, event) {
-            //console.log(tab, event);
-        },*/
+    handleMenuSelect(key, keyPath) {
+      //应对菜单选择
+      if (key == "1-1") {
+        this.createFileMessageBox(this.currentTreeNode);
+      } else if (key == "1-2") {
+        this.createFolderMessageBox(this.currentTreeNode);
+      } else if (key == "1-3") {
+        document.querySelector(".uploadButton").click();
+      } else if (key == "1-4") {
+        this.downloadFile(this.currentTreeNode);
+      } else if (key == "1-5") {
+        this.saveFile(this.currentTreeNode);
+      } else if (key == "1-6") {
+        if (this.currentTreeNode["data"]["folder"] == 1) {
+          this.deleteFolder(this.currentTreeNode);
+        } else {
+          this.deleteFile(this.currentTreeNode);
+        }
+      }
+    },
+    handleContextmenu(key, keyPath) {
+      if (key == "1") {
+        this.createFileMessageBox(this.ContextmenuNode);
+      } else if (key == "2") {
+        this.createFolderMessageBox(this.ContextmenuNode);
+      } else if (key == "3") {
+        if (this.ContextmenuNode["data"]["folder"] == 1) {
+          this.deleteFolder(this.ContextmenuNode);
+        } else {
+          this.deleteFile(this.ContextmenuNode);
+        }
+      } else if (key == "4") {
+        this.downloadFile(this.ContextmenuNode);
+      }
+    },
     handleTabsEdit(targetName, action) {
       //应对动态添加/删除tabs，action: 'remove' | 'add'
       if (action === "add") {
         console.log("add!" + targetName);
       } else if (action === "remove") {
-        console.log("remove!" + targetName);
+        this.removeTab(targetName);
       }
     }, //TODO: 定义添加或删除tabs的函数
+    handleTabChange() {
+      //改变tab的同时改变currentTreeNode并聚焦，使两者关联，便于保存文件的实现
+      this.focusTreeNode(this.$refs.tree.getNode(this.active_name));
+    },
+    addTab(tabtitle, tabname, tabcontent) {
+      this.editableTabs.push({
+        title: tabtitle,
+        name: tabname,
+        content: tabcontent,
+      });
+      this.active_name = tabname;
+    },
+    removeTab(tabname) {
+      if (this.active_name === tabname) {
+        this.editableTabs.forEach((tab, index) => {
+          if (tab.name === tabname) {
+            var nextTab =
+              this.editableTabs[index + 1] || this.editableTabs[index - 1];
+            if (nextTab) {
+              this.active_name = nextTab.name;
+            } else {
+              this.active_name = null;
+            }
+          }
+        });
+      }
+      this.editableTabs = this.editableTabs.filter(
+        (tab) => tab.name !== tabname
+      );
+    },
     focusTreeNode(treenode) {
       this.currentTreeNode = treenode;
       this.$nextTick(() => {
-        this.$refs.tree.setCurrentKey(this.currentTreeNode["data"]["id"]);
+        if (this.currentTreeNode == null) {
+          this.$refs.tree.setCurrentKey(null);
+        } else {
+          this.$refs.tree.setCurrentNode(this.currentTreeNode);
+        }
       });
     },
+    openFile(treenode) {
+      var findtab = false;
+      this.editableTabs.forEach((tab) => {
+        if (tab.title === treenode["data"]["name"]) {
+          this.active_name = tab.name;
+          findtab = true;
+        }
+      });
+      if (!findtab) {
+        var filepath =
+          this.getCurrentFilePath(treenode) + treenode["data"]["name"];
+        axios
+          .post(
+            "http://127.0.0.1:4523/m1/1454888-0-default/project/download-file",
+            JSON.stringify({
+              session: this.session, //把props里接受session发送到后端
+              project: this.project,
+              name: filepath,
+            })
+          )
+          .then((resp) => {
+            if (resp["data"]["code"] == 0) {
+              this.addTab(
+                treenode["data"]["name"],
+                `${treenode["data"]["id"]}`,
+                atob(resp["data"]["file"])
+              );
+            } else if (resp["data"]["code"] == 1) {
+              alert("session无效");
+            } else if (resp["data"]["code"] == 2) {
+              alert("项目不存在");
+            } else if (resp["data"]["code"] == 3) {
+              alert("文件不存在");
+            } else if (resp["data"]["code"] == 4) {
+              alert("路径为文件夹而非文件");
+            } else {
+              alert("未知错误");
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+    },
     handleNodeClick(data, treenode) {
+      //应对点击节点
       this.focusTreeNode(treenode);
       if (data["folder"] == 1) {
         //如果是文件夹，加入或移除默认展开列表
@@ -405,7 +687,28 @@ export default defineComponent({
         } else {
           this.expandedTreeId.push(data["id"]);
         }
+      } else {
+        //如果是文件，新增或打开右侧编辑器的tab，title和文件名相同
+        this.openFile(treenode);
       }
+    },
+    hideContextmenu() {
+      // 取消鼠标监听事件 菜单栏
+      this.menuVisible = false;
+      this.ContextmenuNode = null;
+      document.removeEventListener("click", this.hideContextmenu); // 关掉监听，
+    },
+    handleNodeContextmenu(event, data, treenode) {
+      //应对右键点击节点
+      this.menuVisible = false; // 先把模态框关死，为了多次点击右键时菜单能随鼠标移动
+      this.menuVisible = true; // 显示模态窗口，跳出自定义菜单栏
+      this.ContextmenuNode = treenode;
+      event.preventDefault(); //关闭浏览器右键默认事件
+      let menu = document.querySelector(".contextmenu");
+      /* 菜单定位基于鼠标点击位置 */
+      menu.style.left = event.clientX - 100 + "px";
+      menu.style.top = event.clientY - 60 + "px";
+      document.addEventListener("click", this.hideContextmenu);
     },
     addIdPropertyAndSort(tree_arr) {
       function objectSort(firstproperty) {
@@ -498,7 +801,7 @@ export default defineComponent({
   /* 编辑器区域 */
   padding: 5px 18px;
 }
-
+//自定义图标
 #folder_close {
   width: 18px;
   height: 18px;
@@ -515,5 +818,39 @@ export default defineComponent({
   //文件名过长显示省略号
   text-overflow: ellipsis;
   overflow: hidden;
+}
+//右键菜单
+#BOX_PROJECT_FILE_LIST > .el-menu {
+  position: absolute;
+  background-color: #fff;
+  width: 120px;
+  /*height: 106px;*/
+  font-size: 10px;
+  color: #444040;
+  border-radius: 4px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  white-space: nowrap;
+  z-index: 1000;
+}
+#BOX_PROJECT_FILE_LIST > .el-menu > .el-menu-item {
+  display: block;
+  line-height: 34px;
+  text-align: left;
+}
+#BOX_PROJECT_FILE_LIST > .el-menu > .el-menu-item:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+#BOX_PROJECT_FILE_LIST > .el-menu > .el-menu-item:hover {
+  cursor: pointer;
+  background: #66b1ff;
+  border-color: #66b1ff;
+  color: #fff;
+}
+.uploadhide {
+  display: none;
 }
 </style>
