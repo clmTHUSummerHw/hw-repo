@@ -3,8 +3,8 @@ class UserInfo():
     username = str
 
     def __init__(self, username) -> None:
-        username = username
-        pass
+        self.username = username
+        
 
 
 user_dict = {}  # session: userinfo(class UserInfo)
