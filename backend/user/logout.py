@@ -12,7 +12,7 @@ def logout(): # 释放session
         return jsonify({'code': -1})
 
     if session not in user_dict: # 如果登录名单里没找到此session，返回-1（未知错误）
-        return jsonify({'code': -1})  
+        return jsonify({'code': -1})
 
-    del user_dict[session] 
+    del user_dict[session]
     return jsonify({'code': 0})  # 返回0（退出登录成功）

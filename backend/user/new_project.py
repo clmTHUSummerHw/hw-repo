@@ -3,7 +3,7 @@ import os
 from flask import request, jsonify
 from db.models import User, Project
 from db import db
-from user_dict import user_dict
+from user.user_dict import user_dict
 
 name_re = re.compile(r'\w{1,256}')
 
@@ -17,7 +17,7 @@ def new_project(): # 创建项目文件夹，并把项目信息加入数据库
 
     if not isinstance(session, str) or not isinstance(name, str): # 若request没有username或password，返回-1（未知错误）
         return jsonify({'code': -1})
-    
+
     if session not in user_dict: # 在用户名单里没有找到对应session，返回1（session无效）
         return jsonify({'code': 1})
 

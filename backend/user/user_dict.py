@@ -4,7 +4,7 @@ class UserInfo():
 
     def __init__(self, username) -> None:
         self.username = username
-        
+
 
 
 user_dict = {}  # session: userinfo(class UserInfo)

@@ -2,7 +2,7 @@ import os
 from flask import request, jsonify
 from db.models import User
 from db import db
-from user_dict import user_dict
+from user.user_dict import user_dict
 
 
 def delete_project(): # 从数据库中删除项目，并删除项目文件夹
@@ -15,7 +15,7 @@ def delete_project(): # 从数据库中删除项目，并删除项目文件夹
 
     if not isinstance(session, str) or not isinstance(name, str): # 若request没有username或password，返回-1（未知错误）
         return jsonify({'code': -1})
-    
+
     if session not in user_dict: # 在用户名单里没有找到对应session，返回1（session无效）
         return jsonify({'code': 1})
 
@@ -25,9 +25,9 @@ def delete_project(): # 从数据库中删除项目，并删除项目文件夹
 
     if not project: # 若数据库中不能查询到该项目，返回2（项目不存在）
         return jsonify({'code': 2})
-    
+
     db.session.delete(project)
-    db.session.commite()
+    db.session.commit()
 
     dir_path = './project_storage/' + username + '/' + name
     for root, dirs, files in os.walk(dir_path, topdown=False):
