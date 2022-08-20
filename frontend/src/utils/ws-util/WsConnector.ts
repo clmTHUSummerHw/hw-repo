@@ -1,16 +1,22 @@
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 
-const root_path = '/api'
+const root_path = 'ws://localhost:5000'
 
-export default class WSConnetor
+export default class WSConnector
 {
     connection: Socket
-    constructor(namespace: string)
+    private session: string
+    constructor(namespace: string, session: string)
     {
-        this.connection = io(root_path + namespace)
-        this.connection.on('connect', () => {
-            console.log(this.connection);
-        })
+        this.connection = io(root_path + namespace);
+        this.session = session;
+        this.connection.connect();
+        this.connection.emit('connect_ws', {session: this.session});
+    }
+
+    emit()
+    {
+        
     }
 }
