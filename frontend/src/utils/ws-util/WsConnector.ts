@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 
 const root_path = '/api'
 
-export default class WSConnetor
+export default class WSConnector
 {
     connection: Socket
     constructor(namespace: string)
