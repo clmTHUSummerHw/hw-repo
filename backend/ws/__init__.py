@@ -5,10 +5,10 @@ from run import run_api
 from debug import debug_api
 
 
-ws = SocketIO()
+ws = SocketIO(cors_allowed_origins='*')
 
-ws.on_event('connect', connect)
-ws.on_event('disconnect', disconnect)
+ws.on_event('connect_ws', connect)
+ws.on_event('disconnect_ws', disconnect)
 
 run_api.init_ws(ws)
 debug_api.init_ws(ws)

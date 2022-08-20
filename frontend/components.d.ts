@@ -9,7 +9,6 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     EditorFileList: typeof import('./src/components/EditorFileList.vue')['default']
     EditorMain: typeof import('./src/components/EditorMain.vue')['default']
-    EditorMainArea: typeof import('./src/components/EditorMainArea.vue')['default']
     EditorMenu: typeof import('./src/components/EditorMenu.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']

@@ -26,12 +26,6 @@ export default defineConfig({
                 secure: false,
                 changeOrigin: false,
                 rewrite: (path) => path.replace(/^\/api/, '')
-            },
-            '/lsp': {
-                target: 'http://localhost:5001',
-                secure: false,
-                changeOrigin: false,
-                rewrite: (path) => path.replace(/^\/lsp/, '')
             }
         }
     },
