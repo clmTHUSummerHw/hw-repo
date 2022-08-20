@@ -9,7 +9,7 @@
                     <h3>用户信息</h3>
                     <a>用户名: </a>
                     <!--若为已登录用户，则显示用户名，否则显示一条杠-->
-                    <a v-if="isLogin"> {{ $store.state.username }} </a>
+                    <a v-if="isLogin"> {{ userStore.username }} </a>
                     <a v-else> - </a>
 
                     <a>登录状态: </a>
@@ -41,6 +41,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useUserStore } from "@/stores/user";
 
 export default defineComponent({
     name: "ProjectList",
@@ -52,9 +53,16 @@ export default defineComponent({
         }
     },
 
+    computed: {
+        userStore()
+        {
+            return useUserStore();
+        }
+    },
+
     mounted() //如需要使用async，直接把这里改为async mounted()
     {
-        //TODO: 加载用户信息及项目信息（从vuex加载一部分，通过post请求获得另一部分）（尽量使用async，不要嵌套回调函数）
+        //TODO: 加载用户信息及项目信息（从pinia加载一部分，通过post请求获得另一部分）（尽量使用async，不要嵌套回调函数）
     }
 })
 </script>

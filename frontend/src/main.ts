@@ -1,14 +1,18 @@
 import { createApp } from 'vue'
-import elementPlus from 'element-plus'
+import { createPinia } from 'pinia'
+
 import App from './App.vue'
 import router from './router'
-import store from './store'
+import axios from 'axios';
+import setupAll from './languages/setupAll';
 
+axios.defaults.baseURL = '/api/'
 
-import 'element-plus/dist/index.css'
+const app = createApp(App)
 
-createApp(App)
-.use(store)
-.use(router)
-.use(elementPlus)
-.mount('#app')
+app.use(createPinia())
+app.use(router)
+
+setupAll.setup();
+
+app.mount('#app')
