@@ -8,7 +8,7 @@ export default class WSConnector
     connection: Socket
     constructor(namespace: string)
     {
-        this.connection = io(root_path + namespace)
+        this.connection = io(root_path)
         this.connection.on('connect', () => {
             console.log(this.connection);
         })
