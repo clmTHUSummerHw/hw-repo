@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict
 from flask_socketio import SocketIO
 
 
+# 用于连接Websocket的类
 class WsHelper:
     __ws: SocketIO
     namespace: str
@@ -22,5 +23,6 @@ class WsHelper:
         else:
             self.__ws.on_event(event_name, handler, self.namespace)
 
-    def emit(self, to: str, event_name: str, *args: Any) -> None:
-        self.__ws.emit(event_name, args=args, to=to)
+    # 把事件发送给指定用户。event_name：事件名称，args：事件参数
+    def emit(self, session: str, event_name: str, *args: Any) -> None:
+        self.__ws.emit(event_name, args=args, to=session)
