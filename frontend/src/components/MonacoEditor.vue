@@ -145,11 +145,12 @@ export default defineComponent({
                 return;
 
             if (!this.reloaded)
+            {
                 this.edited = true;
+                this.$emit('update:modelValue', value);
+            }
             else
                 this.reloaded = false;
-
-            this.$emit('update:modelValue', value);
         },
 
         //通过类似加锁的方式安全设置editor值
@@ -164,6 +165,7 @@ export default defineComponent({
             if (!this.edited)
             {
                 this.reloaded = true;
+                console.log(value);
                 editor?.setValue(value);
             }
             else

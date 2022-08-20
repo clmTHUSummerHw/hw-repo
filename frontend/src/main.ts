@@ -6,6 +6,8 @@ import router from './router'
 import axios from 'axios';
 import setupAll from './languages/setupAll';
 
+import '@/assets/main.css'
+
 axios.defaults.baseURL = '/api/'
 
 const app = createApp(App)
