@@ -36,8 +36,7 @@
             </el-form>
 
             <p>已有账号?</p>
-            <el-link href="/index">点此登录!</el-link>
-            <!--href有待修改-->
+            <router-link to="/">点此登录!</router-link>
         </div>
     </div>
 </template>

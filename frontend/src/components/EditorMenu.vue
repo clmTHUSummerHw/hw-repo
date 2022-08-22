@@ -15,6 +15,7 @@
         <el-sub-menu index="2">
             <template #title>编辑</template>
             <el-menu-item index="2-1">依赖管理</el-menu-item>
+            <el-menu-item index="2-2" @click="goProjectList">返回项目列表</el-menu-item>
         </el-sub-menu>
 
         <!--帮助栏目-->
@@ -140,6 +141,10 @@ export default defineComponent({
                 let raw = file.raw as File;
                 this.filesToUpload.push(raw);
             }
+        },
+        goProjectList()
+        {
+            this.$router.push('/project-list');
         }
     }
 })
