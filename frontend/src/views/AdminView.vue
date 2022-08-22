@@ -78,9 +78,10 @@ export default defineComponent({
                 //TODO: 处理错误情况
             }
              */
-            //没有后端代码，暂时不用POST方法
+            //没有后端代码，暂时不用POST方法，此后再使用这段代码
             this.$router.push({
-                name:"projectLog", params: {
+                name:"projectLog", 
+                params: {
                     username:row.projectUsername, 
                     projectName: row.projectName
                 }

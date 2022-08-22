@@ -4,6 +4,10 @@
             <el-header class="box-header"> <!--标题-->
                 <el-button type="primary" @click="goAdmin" class="backButton" size="big">返回</el-button>
                 <div class="title">日志页面</div>
+                <div class="projectUserInfo">
+                    <a>当前用户名：{{userName}}</a><br>
+                    <a>当前项目名：{{projectName}}</a>
+                </div>
             </el-header>
 
             <el-main>
@@ -18,7 +22,7 @@
                     <!--prop是logData中的键-->
                     <el-table-column prop="logDatetime" label="日期时间" sortable></el-table-column>
                     <el-table-column prop="logContent" label="具体内容"></el-table-column>
-                    <el-table-column prop="logMemo" label="备注"></el-table-column>
+                    <el-table-column prop="logObject" label="操作对象"></el-table-column>
 
                 </el-table>
             </el-main>
@@ -45,9 +49,16 @@ export default defineComponent({
             this.$router.push({name:'admin'});
         }
     },
-
     computed: {
-        
+        userName() {
+            return this.$route.params.username;
+        },
+        projectName() {
+            return this.$route.params.projectName
+        },
+        getOperation() {
+            //TODO: 根据相应中log[x].code输出字符串形式的操作内容
+        }
     }
 })
 </script>
@@ -83,7 +94,7 @@ export default defineComponent({
 
     .box-header
     {
-        /* 顶部展示当前用户信息 */
+        /* 顶部展示当前用户、项目信息 */
         padding: 0;
 
         display: flex;
@@ -94,23 +105,19 @@ export default defineComponent({
 
     .title
     {
-        /* “项目列表” 字体设置 */
+        /* “日志页面” 字体设置 */
         font-size: 36px;
         height: 58px;
-        flex-grow: 1;
+        flex-grow: 5;
     }
 
-    .user-info
+    .projectUserInfo
     {
-        /* 调整用户信息栏的flex-grow */
-        flex-grow: 4;
-
-        h3
-        {
-            /* 调整用户信息栏标题上下margin */
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
+        /* 展示用户名、项目名 */
+        font-size: 18px;
+        height: 58px;
+        flex-grow: 1;
+        text-align: left;
     }
     
     .backButton {
