@@ -85,7 +85,6 @@ export default defineComponent({
             try
             {
                 let hash = md5.update(this.form.password).hex();
-                console.log(hash);
                 let result = await axios.post('/user/login', {
                     username: this.form.username,
                     password: hash
@@ -99,7 +98,8 @@ export default defineComponent({
                 }
                 this.userStore.username = this.form.username;
                 this.userStore.session = data.session;
-                alert('登录成功！');22
+                console.log(data.session);
+                alert('登录成功！');
                 this.$router.push('/project-list');
                 return;
             }

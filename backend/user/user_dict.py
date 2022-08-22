@@ -1,4 +1,7 @@
 
+from typing import Dict
+
+
 class UserInfo():
     username = str
 
@@ -7,7 +10,7 @@ class UserInfo():
 
 
 
-user_dict = {}  # session: userinfo(class UserInfo)
+user_dict: Dict[str, UserInfo] = {}  # session: userinfo(class UserInfo)
 
 def joindict(session = str, username = str):
     user_dict[session] = UserInfo(username)
