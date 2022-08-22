@@ -44,5 +44,8 @@ export const useRunningStore = defineStore({
         {
             this.wsConnectors.debug = ws;
         }
+    },
+    persist: {
+        enabled: true
     }
 })

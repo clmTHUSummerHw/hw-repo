@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPersist from 'pinia-plugin-persist';
 
 import App from './App.vue'
 import router from './router'
@@ -9,12 +10,14 @@ import setupAll from './languages/setupAll';
 import '@/assets/main.css'
 import 'font-awesome/css/font-awesome.css'
 
-axios.defaults.baseURL = '/api/'
+axios.defaults.baseURL = '/api/';
 
-const app = createApp(App)
+const app = createApp(App);
+const pinia = createPinia();
 
-app.use(createPinia())
-app.use(router)
+pinia.use(piniaPersist);
+app.use(pinia);
+app.use(router);
 
 setupAll.setup();
 

@@ -37,5 +37,8 @@ export const useEditorStore = defineStore({
             tree: new TreeStates(),
             tab: new TabStates()
         }
+    },
+    persist: {
+        enabled: true
     }
 })

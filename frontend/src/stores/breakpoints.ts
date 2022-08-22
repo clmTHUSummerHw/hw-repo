@@ -48,5 +48,8 @@ export const useBreakpointsStore = defineStore({
             if(this.breakpoints.get(file)?.size == 0)
                 this.breakpoints.delete(file);
         }
+    },
+    persist: {
+        enabled: true
     }
 })

@@ -6,7 +6,7 @@ from flask_socketio import SocketIO
 class WsHelper:
     __ws: SocketIO
     namespace: str
-    __handlers: Dict[str, Callable[[Any]]]
+    __handlers: Dict[str, Callable[[Any], None]]
     def __init__(self, namespace: str) -> None:
         self.__ws = None
         self.namespace = namespace
@@ -17,7 +17,7 @@ class WsHelper:
         for i in self.__handlers:
             self.__ws.on_event(i, self.__handlers[i], self.namespace)
 
-    def on_event(self, event_name: str, handler: Callable[[Any]]) -> None:
+    def on_event(self, event_name: str, handler: Callable[[Any], None]) -> None:
         if self.__ws is None:
             self.__handlers[event_name] = handler
         else:

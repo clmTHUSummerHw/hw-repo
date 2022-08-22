@@ -3,7 +3,7 @@ from db import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True)
-    password = db.Column(db.String(64))
+    password = db.Column(db.String(32))
     def __init__(self, username, password) -> None:
         super().__init__()
         self.username = username
