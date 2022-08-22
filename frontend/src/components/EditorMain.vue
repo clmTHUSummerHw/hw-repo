@@ -133,6 +133,7 @@ export default defineComponent({
 #editor-main
 {
     overflow: hidden;
+    padding: 2px;
 
     .big-container
     {

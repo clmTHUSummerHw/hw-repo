@@ -4,11 +4,16 @@
             <el-header class="editor-header">
                 <EditorMenu />
             </el-header>
-            <el-container class="content">
+            <el-container class="editor-content">
                 <el-aside class="editor-aside">
                     <EditorFileList />
                 </el-aside>
-                <EditorMain />
+                <el-container>
+                    <EditorMain />
+                    <el-footer height="30%" class="console-container">
+                        <EditorConsole />
+                    </el-footer>
+                </el-container>
             </el-container>
         </el-container>
     </div>
@@ -19,12 +24,14 @@ import EditorMenu from "@/components/EditorMenu.vue";
 import { defineComponent } from "vue";
 import EditorFileList from "@/components/EditorFileList.vue";
 import EditorMain from "../components/EditorMain.vue";
+import EditorConsole from "../components/EditorConsole.vue";
 
 export default defineComponent({
     components: {
     EditorMenu,
     EditorFileList,
-    EditorMain
+    EditorMain,
+    EditorConsole
 }
 })
 </script>
@@ -67,6 +74,17 @@ export default defineComponent({
         width: 200px;
         padding: 20px;
         border-right: 1px solid rgb(223, 223, 223);
+    }
+
+    .editor-content
+    {
+        height: 100%;
+    }
+
+    .console-container
+    {
+        padding: 0px;
+        border-top: 1px solid var(--el-border-color);
     }
 }
 </style>

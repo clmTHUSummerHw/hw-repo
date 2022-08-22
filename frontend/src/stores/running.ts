@@ -16,7 +16,8 @@ export const useRunningStore = defineStore({
             debugCommandTriggered: false,
             running: false,
             debugging: false,
-            wsConnectors: new WSConnectors
+            wsConnectors: new WSConnectors,
+            consoleText: ""
         }
     }
 })
