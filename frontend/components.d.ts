@@ -7,9 +7,10 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    EditorConsole: typeof import('./src/components/EditorConsole.vue')['default']
+    EditorDebugger: typeof import('./src/components/EditorDebugger.vue')['default']
     EditorFileList: typeof import('./src/components/EditorFileList.vue')['default']
     EditorMain: typeof import('./src/components/EditorMain.vue')['default']
-    EditorMainArea: typeof import('./src/components/EditorMainArea.vue')['default']
     EditorMenu: typeof import('./src/components/EditorMenu.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -27,6 +28,7 @@ declare module '@vue/runtime-core' {
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableCollumn: typeof import('element-plus/es')['ElTableCollumn']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']

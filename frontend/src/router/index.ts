@@ -3,6 +3,8 @@ import IndexView from '@/views/IndexView.vue'
 import SignUpView from '@/views/SignUpView.vue'
 import ProjectListView from '@/views/ProjectListView.vue'
 import EditorView from '@/views/EditorView.vue'
+import AdminPageView from '@/views/AdminView.vue'
+import ProjectLogView from '@/views/ProjectLogView.vue'
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -26,6 +28,16 @@ const router = createRouter({
             path: '/editor',
             name: 'editor',
             component: EditorView
+        },
+        {
+            path: '/admin',
+            name: 'admin',
+            component: AdminPageView
+        },
+        {
+            path: '/log/:username/:projectName',
+            name: 'projectLog',
+            component: ProjectLogView
         }
     ]
 })
