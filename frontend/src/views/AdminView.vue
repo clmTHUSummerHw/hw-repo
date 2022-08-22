@@ -12,7 +12,7 @@
                 table-layout="auto"
                 :data="projectData"
                 style="width: 100%">
-                
+
                     <!--prop是projectData中的键-->
                     <el-table-column prop="projectUsername" label="项目发起人"></el-table-column>
                     <el-table-column prop="projectName" label="项目名称" sortable></el-table-column>
@@ -20,10 +20,10 @@
                     <el-table-column prop="projectDirectory" label="项目路径"></el-table-column>
                     <el-table-column> <!--搜索栏以及查看项目日志链接-->
                         <template #default="scope">
-                            <el-button 
+                            <el-button
                                 @click="getLog(scope.row)"
-                                link 
-                                type="primary" 
+                                link
+                                type="primary"
                                 size="small">查看项目日志
                             </el-button>
                         </template>
@@ -80,9 +80,9 @@ export default defineComponent({
              */
             //没有后端代码，暂时不用POST方法，此后再使用这段代码
             this.$router.push({
-                name:"projectLog", 
+                name:"projectLog",
                 params: {
-                    username:row.projectUsername, 
+                    username:row.projectUsername,
                     projectName: row.projectName
                 }
             });

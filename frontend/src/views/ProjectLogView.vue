@@ -18,7 +18,7 @@
                 empty-text="No Log"
                 :data="logData"
                 style="width: 100%">
-                
+
                     <!--prop是logData中的键-->
                     <el-table-column prop="logDatetime" label="日期时间" sortable></el-table-column>
                     <el-table-column prop="logContent" label="具体内容"></el-table-column>
@@ -39,7 +39,7 @@ export default defineComponent({
     {
         return {
             logData: [
-                
+
             ] //table中项目信息
         }
     },
@@ -119,7 +119,7 @@ export default defineComponent({
         flex-grow: 1;
         text-align: left;
     }
-    
+
     .backButton {
         margin-left: 20px;
     }

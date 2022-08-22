@@ -142,7 +142,7 @@ export default defineComponent({
                 this.filesToUpload.push(raw);
             }
         },
-        goProjectList() 
+        goProjectList()
         {
             this.$router.push('/project-list');
         }
