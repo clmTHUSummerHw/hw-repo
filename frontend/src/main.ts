@@ -7,6 +7,7 @@ import axios from 'axios';
 import setupAll from './languages/setupAll';
 
 import '@/assets/main.css'
+import 'font-awesome/css/font-awesome.css'
 
 axios.defaults.baseURL = '/api/'
 

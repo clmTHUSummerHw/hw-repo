@@ -6,7 +6,14 @@
             </el-header>
             <el-container class="editor-content">
                 <el-aside class="editor-aside">
-                    <EditorFileList />
+                    <el-tabs class="aside-main">
+                        <el-tab-pane label="文件列表">
+                            <EditorFileList />
+                        </el-tab-pane>
+                        <el-tab-pane label="调试器" class="full-height">
+                            <EditorDebugger />
+                        </el-tab-pane>
+                    </el-tabs>
                 </el-aside>
                 <el-container>
                     <EditorMain />
@@ -25,14 +32,16 @@ import { defineComponent } from "vue";
 import EditorFileList from "@/components/EditorFileList.vue";
 import EditorMain from "../components/EditorMain.vue";
 import EditorConsole from "../components/EditorConsole.vue";
+import EditorDebugger from "../components/EditorDebugger.vue";
 
 export default defineComponent({
     components: {
-    EditorMenu,
-    EditorFileList,
-    EditorMain,
-    EditorConsole
-}
+        EditorMenu,
+        EditorFileList,
+        EditorMain,
+        EditorConsole,
+        EditorDebugger
+    }
 })
 </script>
 
@@ -54,6 +63,11 @@ export default defineComponent({
     background-color: white;
     background-image: url(@/assets/small_logo_bg.png);
 
+    .editor-header
+    {
+        padding: 0px;
+    }
+
     .box-base
     {
         /* 整体框 */
@@ -72,8 +86,29 @@ export default defineComponent({
     .editor-aside
     {
         width: 200px;
-        padding: 20px;
+        padding: 2px;
         border-right: 1px solid rgb(223, 223, 223);
+        overflow: hidden;
+
+        .aside-main
+        {
+            height: 100%;
+
+            .el-tabs__header
+            {
+                margin-bottom: 8px;
+            }
+
+            .el-tabs__content
+            {
+                height: calc(100% - var(--el-tabs-header-height) - 8px);
+            }
+        }
+
+        .full-height
+        {
+            height: 100%;
+        }
     }
 
     .editor-content

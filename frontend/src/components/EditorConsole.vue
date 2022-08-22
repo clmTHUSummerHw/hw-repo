@@ -2,11 +2,14 @@
     <el-container id="editor-console">
         <el-header class="no-padding" height="var(--title-height)">
             <el-row>
-                <el-col :span="20">
-                    <div class="console-title"></div>
+                <el-col :span="23">
+                    <div class="console-title">终端</div>
                 </el-col>
-                <el-col :span="2">
-                    <el-button size="small">Stop</el-button>
+                <el-col :span="1">
+                    <el-button type="danger" circle size="small"
+                    :disabled="!(runningStore.running || runningStore.debugging)">
+                        Stop
+                    </el-button>
                 </el-col>
             </el-row>
         </el-header>
@@ -14,7 +17,8 @@
             <textarea class="console-text no-padding" v-model="runningStore.consoleText" disabled></textarea>
         </el-main>
         <el-footer class="no-padding" height="var(--input-height)">
-            <input class="no-padding" v-model="inputtingText" @keyup.enter.native="handleInput">
+            <input class="no-padding" v-model="inputtingText" @keyup.enter.native="handleInput"
+            :disabled="!(runningStore.running || runningStore.debugging)">
         </el-footer>
     </el-container>
 </template>
@@ -59,17 +63,21 @@ export default defineComponent({
         {
             this.runningStore.runCommandTriggered = false;
             this.runningStore.running = true;
-            this.runningStore.wsConnectors.run = new WSConnector('/run', this.userStore.session);
+            this.runningStore.setRunWS(new WSConnector('/run', this.userStore.session));
             this.ws = this.runningStore.wsConnectors.run;
-            this.ws.on('output', data => this.onOutput(data as OutputResult));
+
+            if(this.ws != null)
+                this.ws.on('output', data => this.onOutput(data as OutputResult));
         }
         else if (this.runningStore.debugCommandTriggered)
         {
             this.runningStore.debugCommandTriggered = false;
             this.runningStore.debugging = true;
-            this.runningStore.wsConnectors.debug = new WSConnector('/debug', this.userStore.session);
+            this.runningStore.setDebugWS(new WSConnector('/debug', this.userStore.session));
             this.ws = this.runningStore.wsConnectors.debug;
-            this.ws.on('output', data => this.onOutput(data as OutputResult));
+
+            if(this.ws != null)
+                this.ws.on('output', data => this.onOutput(data as OutputResult));
         }
         else if(this.runningStore.running)
         {
@@ -131,7 +139,7 @@ export default defineComponent({
         word-break: break-all;
         overflow-x: hidden;
         overflow-y: scroll;
-        border: 1px solid;
+        border: 1px solid #808080;
         border-bottom: 0px;
         font-size: var(--input-font-size);
         font-family: consolas;
@@ -140,7 +148,7 @@ export default defineComponent({
     input
     {
         width: 100%;
-        border: 1px solid;
+        border: 1px solid #808080;
         border-top: 0px;
         border-radius: 0px;
         font-size: var(--input-font-size);

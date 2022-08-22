@@ -7,6 +7,19 @@ class WSConnectors
     debug: WSConnector | undefined = undefined;
 }
 
+export class VariableData
+{
+    name: string = ''
+    value: string = ''
+}
+
+class DebuggerStatus
+{
+    currentFile: string = ''
+    currentLine: number = -1
+    variables: VariableData[] = []
+}
+
 export const useRunningStore = defineStore({
     id: 'running',
     state()
@@ -17,7 +30,19 @@ export const useRunningStore = defineStore({
             running: false,
             debugging: false,
             wsConnectors: new WSConnectors,
-            consoleText: ""
+            consoleText: "",
+            debuggerStatus: new DebuggerStatus
+        }
+    },
+    actions: {
+        setRunWS(ws: WSConnector)
+        {
+            this.wsConnectors.run = ws;
+        },
+
+        setDebugWS(ws: WSConnector)
+        {
+            this.wsConnectors.debug = ws;
         }
     }
 })
