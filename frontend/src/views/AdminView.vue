@@ -69,6 +69,7 @@ export default defineComponent({
                 username: row.projectUsername,
                 projectname: row.projectName
             });
+            /*
             try {
                 axios.post('/project/log', jsonForm);
             }
@@ -76,6 +77,14 @@ export default defineComponent({
                 console.log(e);
                 //TODO: 处理错误情况
             }
+             */
+            //没有后端代码，暂时不用POST方法
+            this.$router.push({
+                name:"projectLog", params: {
+                    username:row.projectUsername, 
+                    projectName: row.projectName
+                }
+            });
         }
     }
 })

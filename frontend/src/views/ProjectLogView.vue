@@ -12,7 +12,7 @@
                 border
                 table-layout="auto"
                 empty-text="No Log"
-                :data="logData" 
+                :data="logData"
                 style="width: 100%">
                 
                     <!--prop是logData中的键-->
