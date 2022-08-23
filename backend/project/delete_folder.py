@@ -27,6 +27,9 @@ def delete_folder():
     if not isinstance(session, str) or not isinstance(project_name, str) or not isinstance(file_full, str):
         return jsonify({'code': -1})
 
+    if file_full == '/' or file_full == '\\':
+        return jsonify({'code': -1})
+
     code, root = get_root(session, project_name)
 
     if code != 0:

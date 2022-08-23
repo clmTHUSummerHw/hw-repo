@@ -51,6 +51,7 @@ import { useUserStore } from "@/stores/user";
 import axios from "axios";
 import type ListProjectsResult from "@/utils/post-util/ListProjectsResult";
 import { useEditorStore } from "@/stores/editor";
+import type ListFilesResult from "@/utils/post-util/ListFilesResult";
 
 export default defineComponent({
     name: "ProjectList",
@@ -100,7 +101,27 @@ export default defineComponent({
 
             try
             {
-                //TODO
+                this.editorStore.project.name = name;
+                let result = await axios.post('/project/list-files', {
+                    session: this.userStore.session,
+                    project: name
+                });
+
+                let data = result.data as ListFilesResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+                this.editorStore.tree.data = [{
+                    folder: 1,
+                    name: name,
+                    files: data.files
+                }];
+
+                this.$router.push('/editor');
+                return;
             }
             catch(e)
             {

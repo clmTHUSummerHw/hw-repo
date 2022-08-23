@@ -111,7 +111,7 @@ export default defineComponent({
                 //获取改变后的内容
                 let t1 = text.substring(0, change.rangeOffset);
                 let t2 = change.text;
-                let t3 = text.substring(change.rangeOffset + change.rangeLength + 1, text.length);
+                let t3 = text.substring(change.rangeOffset + change.rangeLength, text.length);
 
                 //更新modelValue属性
                 this.emitUpdate(t1 + t2 + t3);

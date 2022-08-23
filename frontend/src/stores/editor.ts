@@ -38,7 +38,19 @@ export const useEditorStore = defineStore({
             tab: new TabStates()
         }
     },
+    actions: {
+        updateTree()
+        {
+            console.log('Update Tree');
+        }
+    },
     persist: {
-        enabled: true
+        enabled: true,
+        strategies: [
+            {
+                storage: sessionStorage,
+                paths: ['project']
+            }
+        ]
     }
 })

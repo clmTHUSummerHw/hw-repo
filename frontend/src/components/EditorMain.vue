@@ -22,6 +22,7 @@ import axios from 'axios';
 import type { TabPanelName } from 'element-plus';
 import { defineComponent } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
+import { Base64 } from 'js-base64';
 
 export default defineComponent({
     components: {
@@ -69,6 +70,13 @@ export default defineComponent({
         {
             let tab = this.editorStore.tab.openedTabs.get(name.toString());
 
+            if(tab?.active)
+            {
+                tab.content = this.editorStore.tab.currentText;
+                this.editorStore.tab.currentText = "";
+                this.activeTab = "";
+            }
+
             if (tab == null)
             {
                 console.log("Unknown error");
@@ -84,12 +92,12 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post('/project/upload-file', JSON.stringify({
+                let result = await axios.post('/project/upload-file', {
                     session: this.userStore.session,
                     project: this.editorStore.project.name,
                     name: tab.name,
-                    file: new Buffer(tab.content).toString('base64')
-                }));
+                    file: Base64.encode(tab.content)
+                });
 
                 if((result.data as UploadFileResult).code != 0)
                 {

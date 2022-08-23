@@ -47,6 +47,7 @@ import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { useEditorStore } from '@/stores/editor';
 import type UploadFileResult from '@/utils/post-util/UploadFileResult';
+import { Base64 } from 'js-base64';
 
 class Data
 {
@@ -88,6 +89,7 @@ export default defineComponent({
             {
                 this.uploadFile(file);
             }
+            this.editorStore.updateTree();
         },
 
         async uploadFile(file: File)
@@ -106,12 +108,12 @@ export default defineComponent({
                 fullPath += '/';
                 fullPath += file.name;
 
-                let result = await axios.post('/project/upload-file', JSON.stringify({
+                let result = await axios.post('/project/upload-file', {
                     session: this.userStore.session,
                     project: this.editorStore.project.name,
                     name: fullPath,
-                    file: new Buffer(text).toString('base64')
-                }));
+                    file: Base64.encode(text)
+                });
 
                 let data = result.data as UploadFileResult;
                 if(data.code != 0)
