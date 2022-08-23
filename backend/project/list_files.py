@@ -3,7 +3,6 @@ from unittest import result
 from flask import jsonify, request
 import os
 from project.utils import get_root
-from user.user_dict import user_dict
 from db.models import User
 
 
