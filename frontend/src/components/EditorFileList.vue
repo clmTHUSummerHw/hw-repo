@@ -181,10 +181,10 @@ export default defineComponent({
 
         createFileMessageBox(currentTreeNode: TreeNode)
         {
-            ElMessageBox.prompt("Please input your file name", "新建文件", {
+            ElMessageBox.prompt("请输入文件名", "新建文件", {
                 confirmButtonText: "OK",
                 cancelButtonText: "Cancel",
-                inputPattern: /^[A-Za-z0-9\\.\\_]+$/,
+                inputPattern: /([^/\\:\*\?"<>\|\f\n\r\t\v]*[^/\\:\*\?"<>\|\f\n\r\t\v\.])+/,
                 inputErrorMessage: "请输入正确的文件名",
             })
                 .then(({ value }) =>
@@ -202,10 +202,10 @@ export default defineComponent({
 
         createFolderMessageBox(currentTreeNode: TreeNode)
         {
-            ElMessageBox.prompt("Please input your folder name", "新建文件夹", {
+            ElMessageBox.prompt("请输入文件夹名", "新建文件夹", {
                 confirmButtonText: "OK",
                 cancelButtonText: "Cancel",
-                inputPattern: /^[A-Za-z0-9\\_]+$/,
+                inputPattern: /([^/\\:\*\?"<>\|\f\n\r\t\v]*[^/\\:\*\?"<>\|\f\n\r\t\v\.])+/,
                 inputErrorMessage: "请输入正确的文件夹名",
             })
                 .then(({ value }) =>

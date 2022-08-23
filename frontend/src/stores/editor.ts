@@ -42,6 +42,10 @@ export const useEditorStore = defineStore({
         updateTree()
         {
             console.log('Update Tree');
+        },
+        removeAllTabs()
+        {
+            console.log('Remove All Tabs');
         }
     },
     persist: {

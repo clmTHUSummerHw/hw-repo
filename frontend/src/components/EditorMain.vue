@@ -63,6 +63,12 @@ export default defineComponent({
             content: "Welcome to Thide!"
         });
 
+        this.editorStore.$onAction(({name, store, args, after, onError}) => {
+            if(name == 'removeAllTabs')
+                for(let i of this.editorStore.tab.openedTabs)
+                    this.onTabRemove(i[0]);
+        })
+
         setTimeout(() => {this.activeTab = 'welcome';}, 100);
     },
     methods: {

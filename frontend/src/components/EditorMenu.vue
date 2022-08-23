@@ -146,6 +146,8 @@ export default defineComponent({
         },
         goProjectList()
         {
+            this.editorStore.removeAllTabs();
+            this.editorStore.project.name = "";
             this.$router.push('/project-list');
         }
     }

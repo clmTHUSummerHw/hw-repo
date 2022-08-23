@@ -39,7 +39,7 @@
             <el-footer>
                 <!--创建项目按钮区域-->
                 <el-button type="primary" @click="handleCreateProject">创建项目</el-button>
-                <el-button type="danger" @click="handleQuitLogin">退出登录</el-button>
+                <el-button type="danger" @click="handleLogout">退出登录</el-button>
             </el-footer>
         </el-container>
     </div>
@@ -52,6 +52,8 @@ import axios from "axios";
 import type ListProjectsResult from "@/utils/post-util/ListProjectsResult";
 import { useEditorStore } from "@/stores/editor";
 import type ListFilesResult from "@/utils/post-util/ListFilesResult";
+import type CreateFileResult from "@/utils/post-util/CreateFileResult";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 export default defineComponent({
     name: "ProjectList",
@@ -130,13 +132,104 @@ export default defineComponent({
             }
         },
         async handleDeleteProject(name: string)
-        {},
+        {
+            try
+            {
+                let result = await axios.post('/user/delete-project', {
+                    session: this.userStore.session,
+                    name: name
+                });
+
+                let data = result.data as CreateFileResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+
+                await this.updateProjects();
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        },
         async createProject(name: string)
-        {},
+        {
+            try
+            {
+                let result = await axios.post('/user/new-project', {
+                    session: this.userStore.session,
+                    name: name
+                });
+
+                let data = result.data as CreateFileResult;
+
+                if(data.code != 0)
+                {
+                    alert('未知错误');
+                    console.log('Code: ' + data.code);
+                    return;
+                }
+
+                await this.updateProjects();
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        },
         handleCreateProject()
-        {},
-        async handleQuitLogin()
-        {}
+        {
+            ElMessageBox.prompt("请输入项目名称", "新建项目", {
+                confirmButtonText: "OK",
+                cancelButtonText: "Cancel",
+                inputPattern: /\w{1,256}/,
+                inputErrorMessage: "项目名称只能由字母，数字和下划线组成",
+            })
+                .then(({ value }) =>
+                {
+                    this.createProject(value);
+                })
+                .catch(() =>
+                {
+                    ElMessage({
+                        type: "info",
+                        message: "Input canceled",
+                    });
+                });
+        },
+        async handleLogout()
+        {
+            try
+            {
+                let result = await axios.post('/user/logout', {
+                    session: this.userStore.session
+                });
+
+                let data = result.data as CreateFileResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+
+                this.userStore.session = '';
+                this.$router.push('/');
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        }
     },
     mounted()
     {
