@@ -17,6 +17,7 @@ class User(db.Model):
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(256))
+    create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     user = db.relationship('User', backref=db.backref('projects', lazy='dynamic'))
 
