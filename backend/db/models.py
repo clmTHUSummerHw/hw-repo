@@ -41,7 +41,7 @@ class Log(db.Model):
     # code为2或4时：文件夹名
     # code为9或10时：依赖文件名
     # 其他code：空字符串
-    extra_data = db.Column(db.String(65536))
+    extra_data = db.Column(db.String(1024))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # 获得项目对象（假设名为obj）时，使用obj.log即可查看与其相关的日志
