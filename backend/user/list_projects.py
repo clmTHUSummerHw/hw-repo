@@ -10,7 +10,7 @@ def list_projects(): # 从数据库中查询用户的所有项目
 
     session = request.json['session']
 
-    if not isinstance(session, str): # 若request没有username或password，返回-1（未知错误）
+    if not isinstance(session, str): # 若request没有session，返回-1（未知错误）
         return jsonify({'code': -1, 'project': []})
 
     if session not in user_dict: # 在用户名单里没有找到对应session，返回1（session无效）
