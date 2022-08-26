@@ -20,7 +20,7 @@
                         </el-table>
                     </el-col>
                     <el-col :span="12" class="full-height">
-                        <el-upload drag><!-- TODO: 处理上传操作 -->
+                        <el-upload drag @change="onFileUpload"><!-- TODO: 处理上传操作 -->
                             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                             <div class="el-upload__text">
                                 Drop file here or <em>click to upload</em>
@@ -41,10 +41,12 @@ import { useEditorStore } from '@/stores/editor';
 import { useUserStore } from '@/stores/user';
 import { defineComponent } from 'vue';
 import { UploadFilled } from '@element-plus/icons-vue';
+import type { UploadFile, UploadFiles } from 'element-plus';
+import axios from 'axios';
 
 class Data
 {
-    //TODO: 填充内容
+    dependencies: string[] = []
 }
 
 export default defineComponent({
@@ -55,8 +57,7 @@ export default defineComponent({
     {
         return new Data();
     },
-    computed:
-    {
+    computed: {
         userStore()
         {
             return useUserStore();
@@ -65,6 +66,26 @@ export default defineComponent({
         {
             return useEditorStore();
         },
+    },
+    methods: {
+        async onFileUpload(file: UploadFile, files: UploadFiles)
+        {
+            if(file.raw == null)
+                return;
+            try
+            {
+                let formData = new FormData();
+                formData.append('session', this.userStore.session);
+                formData.append('project', this.editorStore.project.name);
+                formData.append('file', file.raw, file.name);
+                let result = await axios.post('/project/add-dependency', formData);
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        }
     }
 })
 </script>

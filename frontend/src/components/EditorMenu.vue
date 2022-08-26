@@ -16,7 +16,7 @@
         <el-sub-menu index="2">
             <template #title>编辑</template>
             <el-menu-item index="2-1">依赖管理</el-menu-item>
-            <el-menu-item index="2-2" @click="goProjectList">返回项目列表</el-menu-item>
+            <el-menu-item index="2-2">返回项目列表</el-menu-item>
         </el-sub-menu>
 
         <el-sub-menu index="3">
@@ -56,6 +56,7 @@ import { useEditorStore } from '@/stores/editor';
 import type UploadFileResult from '@/utils/post-util/UploadFileResult';
 import { Base64 } from 'js-base64';
 import { useRunningStore } from '@/stores/running';
+import WSConnector from '@/utils/ws-util/WsConnector';
 
 class Data
 {
@@ -92,6 +93,14 @@ export default defineComponent({
         {
             if (key == '1-1')
                 this.openUploadFileDialog();
+            else if(key == '2-1')
+                this.gotoDependencies();
+            else if(key == '2.2')
+                this.goProjectList();
+            else if(key == '3-1')
+                this.startRunning();
+            else if(key == '3-2')
+                this.startDebugging();
         },
 
         uploadFiles()
@@ -162,12 +171,17 @@ export default defineComponent({
             this.editorStore.project.name = "";
             this.$router.push('/project-list');
         },
+        gotoDependencies()
+        {
+            this.$router.push('/dependency-list');
+        },
         startRunning()
         {
+            this.runningStore.runCommandTriggered = true;
         },
         startDebugging()
         {
-
+            this.runningStore.debugCommandTriggered = true;
         }
     }
 })
