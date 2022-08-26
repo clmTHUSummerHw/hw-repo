@@ -15,7 +15,7 @@
     "js-base64": "^3.7.2",
     "js-md5": "^0.7.3",
     "monaco-editor": "^0.34.0",
-    "monaco-languageclient": "^3.0.0",
+    "monaco-languageclient": "^3.0.1",
     "pinia": "^2.0.21",
     "pinia-plugin-persist": "^1.0.0",
     "sass": "^1.54.4",
