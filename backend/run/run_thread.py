@@ -22,16 +22,10 @@ class RunThread(threading.Thread):
         self.user_session = session
         self.ws = ws
         self.array = bytearray()
-        self.inputText = None
-        self.inputFlag = False
     def run(self):
         subprocess.run(self.command1, stdout=PIPE) #编译
         self.execute_subprocess = subprocess.Popen(self.command2, stdin=PIPE, stdout=PIPE) #运行
         while self.execute_subprocess.poll() is None: #子进程未结束
-            if self.inputFlag: #有新的输入
-                self.execute_subprocess.stdin.write(self.inputText)
-                self.execute_subprocess.stdin.flush()
-                inputFlag = False
             currentByte = self.execute_subprocess.stdout.read(1)
             if currentByte != b'\n':
                 self.array += currentByte
@@ -46,7 +40,3 @@ class RunThread(threading.Thread):
         self.ws.emit(self.user_session, 'run_complete')
         #子进程结束
         del running_users[self.user_session]
-
-    def setInput(self, inputText: str):
-        self.inputText = inputText
-        self.inputFlag = True

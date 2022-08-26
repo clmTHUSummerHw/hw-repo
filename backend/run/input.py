@@ -7,5 +7,7 @@ def input(data): #TODO: 获取输入，并传递给对应用户的项目 / data:
     project = data.project #用不到？
     inputText = data.text
 
-    currentThread = running_users[session]
-    currentThread.setInput(inputText) #传入输入
+    currentThread = running_users[session].run_thread
+    currentExecuteProcess = currentThread.execute_subprocess
+    currentExecuteProcess.stdin.write(inputText)
+    currentExecuteProcess.stdin.flush()
