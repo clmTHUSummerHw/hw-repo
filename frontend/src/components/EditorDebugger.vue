@@ -60,6 +60,7 @@ import type { VariableData } from '@/stores/running';
 import type WSConnector from '@/utils/ws-util/WsConnector';
 import type PauseResult from '@/utils/post-util/PauseResult';
 import { useUserStore } from '@/stores/user';
+import { useBreakpointsStore } from '@/stores/breakpoints';
 
 class Data
 {
@@ -80,6 +81,10 @@ export default defineComponent({
         runningStore()
         {
             return useRunningStore();
+        },
+        breakpointsStore()
+        {
+            return useBreakpointsStore();
         },
         currentFile()
         {
@@ -134,9 +139,18 @@ export default defineComponent({
         {
             this.runningStore.debuggerStatus.currentFile = data.file;
             this.runningStore.debuggerStatus.currentLine = data.line;
+            for(let i of this.runningStore.debuggerStatus.variables)
+            {
+                this.ws?.emit('query_value', i.name)
+            }
         },
         onVarValue(data: any)
         {
+            for(let i of this.runningStore.debuggerStatus.variables)
+            {
+                if(data['var'] == i.name)
+                    i.value = data.value
+            }
         }
     },
     mounted()
@@ -149,6 +163,10 @@ export default defineComponent({
                     {
                         this.ws?.on('pause', (data) => this.onPause(data));
                         this.ws.on('var_value', (data) => this.onVarValue(data));
+                        for(let i of this.breakpointsStore.breakpoints)
+                            for(let j of i[1])
+                                this.ws.emit('add_breakpoint', {session: this.userStore.session, file: i[0].replace(/\//g, '.'), line: j});
+                        this.ws.emit('continue_running', {session: this.userStore.session})
                     }
                 });
         });

@@ -1,2 +1,0 @@
-def prepare(data):
-    pass

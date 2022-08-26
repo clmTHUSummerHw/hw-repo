@@ -2,7 +2,6 @@ import subprocess, threading
 from subprocess import PIPE
 from typing import Optional
 from ws.ws_helper import WsHelper
-from run.running_users import running_users
 
 class RunThread(threading.Thread):
     execute_subprocess: Optional[subprocess.Popen] = None
@@ -22,6 +21,7 @@ class RunThread(threading.Thread):
         self.user_session = session
         self.ws = ws
         self.array = bytearray()
+        self.debug = debug
     def run(self):
         subprocess.run(self.command1, stdout=PIPE) #编译
         self.execute_subprocess = subprocess.Popen(self.command2, stdin=PIPE, stdout=PIPE) #运行
@@ -39,4 +39,9 @@ class RunThread(threading.Thread):
         self.ws.emit(self.user_session, 'output', {'text': last_outputs.decode()})
         self.ws.emit(self.user_session, 'run_complete')
         #子进程结束
-        del running_users[self.user_session]
+        if not self.debug:
+            from run.running_users import running_users
+            del running_users[self.user_session]
+        else:
+            from debug.debugging_projects import debugging_projects
+            del debugging_projects[self.user_session]
