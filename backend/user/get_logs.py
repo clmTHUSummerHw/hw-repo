@@ -1,7 +1,5 @@
-import re
 from flask import request, jsonify
 from db.models import User, Log
-from db import db
 from db.models import Log
 
 def get_logs():
