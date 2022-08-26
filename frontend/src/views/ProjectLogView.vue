@@ -60,6 +60,8 @@ export default defineComponent({
                 }
                 let result = await axios.post('/user/get-logs', jsonForm);
                 let data = result.data.log;
+                console.log(data);
+                console.log('it was request data')
                 let result_list = [];
 
                 //根据code返回操作类型字符串
@@ -80,7 +82,7 @@ export default defineComponent({
                         default: break;
                     }
                 }
-                
+
                 for (let i in data)
                 {
                     let current_log = {

@@ -2,6 +2,7 @@ import re
 from flask import request, jsonify
 from db.models import User
 from db import db
+from db.models import Log
 
 def get_logs():
     if not request.is_json: # 若传入的不是json对象，返回-1（未知错误）
@@ -25,7 +26,7 @@ def get_logs():
         return jsonify({'code': 2, 'log': []})
 
     logs = []
-    for log in project.log.all():
+    for log in project.log.order_by(Log.time.desc()).all():
         alone = {}
         alone['code'] = log.code
         alone['time'] = log.time.timestamp()*1000
