@@ -8,7 +8,8 @@
                 </el-tab-pane>
             </el-tabs>
             <div class="el-tabs text-editor-container">
-                <MonacoEditor v-model="editorStore.tab.currentText" :file="activeFile" language="java" />
+                <MonacoEditor v-if="editorVisible" v-model="editorStore.tab.currentText"
+                :file="activeFile" language="java" />
             </div>
         </div>
     </el-main>
@@ -31,7 +32,8 @@ export default defineComponent({
     data()
     {
         return {
-            activeTab: ""
+            activeTab: "",
+            editorVisible: true
         };
     },
     computed: {
@@ -81,6 +83,7 @@ export default defineComponent({
                 tab.content = this.editorStore.tab.currentText;
                 this.editorStore.tab.currentText = "";
                 this.activeTab = "";
+                this.refreshEditor;
             }
 
             if (tab == null)
@@ -98,11 +101,13 @@ export default defineComponent({
 
             try
             {
+                let text = tab.content.replace(/\r\n/g, '\n');
+                console.log(text);
                 let result = await axios.post('/project/upload-file', {
                     session: this.userStore.session,
                     project: this.editorStore.project.name,
                     name: tab.name,
-                    file: Base64.encode(tab.content)
+                    file: Base64.encode(text)
                 });
 
                 if((result.data as UploadFileResult).code != 0)
@@ -121,6 +126,11 @@ export default defineComponent({
                 alert('Unknown error');
                 return;
             }
+        },
+        refreshEditor()
+        {
+            this.editorVisible = false;
+            setTimeout(() => {this.editorVisible = true}, 50);
         }
     },
     watch: {
@@ -137,6 +147,7 @@ export default defineComponent({
             {
                 newTab.active = true;
                 this.editorStore.tab.currentText = newTab.content;
+                this.refreshEditor();
             }
         }
     }

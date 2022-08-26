@@ -59,6 +59,7 @@ import { defineComponent } from 'vue';
 import type { VariableData } from '@/stores/running';
 import type WSConnector from '@/utils/ws-util/WsConnector';
 import type PauseResult from '@/utils/post-util/PauseResult';
+import { useUserStore } from '@/stores/user';
 
 class Data
 {
@@ -72,6 +73,10 @@ export default defineComponent({
         return new Data();
     },
     computed: {
+        userStore()
+        {
+            return useUserStore();
+        },
         runningStore()
         {
             return useRunningStore();
@@ -111,19 +116,19 @@ export default defineComponent({
         },
         handleContinue()
         {
-            this.ws?.emit('continue_running', {});
+            this.ws?.emit('continue_running', {session: this.userStore.session});
         },
         handleStepPass()
         {
-            this.ws?.emit('step_pass', {});
+            this.ws?.emit('step_pass', {session: this.userStore.session});
         },
         handleStepIn()
         {
-            this.ws?.emit('step_in', {});
+            this.ws?.emit('step_in', {session: this.userStore.session});
         },
         handleStepOut()
         {
-            this.ws?.emit('step_out', {});
+            this.ws?.emit('step_out', {session: this.userStore.session});
         },
         onPause(data: PauseResult)
         {

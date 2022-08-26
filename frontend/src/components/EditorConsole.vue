@@ -92,7 +92,7 @@ export default defineComponent({
         handleInput()
         {
             this.runningStore.consoleText += this.inputtingText + "\n";
-            this.ws?.emit('input', {text: this.inputtingText});
+            this.ws?.emit('input', {session: this.userStore.session, text: this.inputtingText});
             this.inputtingText = "";
         },
 
