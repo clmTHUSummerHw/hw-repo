@@ -13,7 +13,7 @@ def delete_project(): # 从数据库中删除项目，并删除项目文件夹
     session = request.json['session']
     name = request.json['name']
 
-    if not isinstance(session, str) or not isinstance(name, str): # 若request没有username或password，返回-1（未知错误）
+    if not isinstance(session, str) or not isinstance(name, str): # 若request没有session或name，返回-1（未知错误）
         return jsonify({'code': -1})
 
     if session not in user_dict: # 在用户名单里没有找到对应session，返回1（session无效）

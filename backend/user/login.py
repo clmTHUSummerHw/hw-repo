@@ -1,7 +1,7 @@
 import random
 import os
 from flask import request, jsonify
-from db.models import Project, User
+from db.models import User
 from user.user_dict import user_dict, joindict
 
 
