@@ -14,7 +14,7 @@ def get_logs():
         return jsonify({'code': -1, 'log': []})
 
     user = User.query.filter_by(username=username).first()
-    project = user.projects.filter_by(name = projectname).first()    
+    project = user.projects.filter_by(name = projectname).first()
 
     if user is None: # 若数据库中查询不到该用户，返回1（用户不存在）
         return jsonify({'code': 1, 'log': []})

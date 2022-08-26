@@ -141,7 +141,7 @@ export default defineComponent({
             this.runningStore.debuggerStatus.currentLine = data.line;
             for(let i of this.runningStore.debuggerStatus.variables)
             {
-                this.ws?.emit('query_value', i.name)
+                this.ws?.emit('query_value', {session: this.userStore.session, 'var': i.name})
             }
         },
         onVarValue(data: any)

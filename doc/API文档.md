@@ -1,6 +1,6 @@
 # API文档
 
-目前的后端API分为用户部分和项目部分。
+Http API分为用户部分和项目部分；Websocket API分为运行部分和调试部分。
 
 用户部分的API接口如下：
 * [用户注册](#用户注册)
@@ -9,6 +9,7 @@
 * [列出所有项目](#列出所有项目)
 * [创建项目](#创建项目)
 * [删除项目](#删除项目)
+* [请求项目日志](#请求项目日志)
 
 项目部分的API接口如下：
 * [列出所有文件](#列出所有文件)
@@ -18,9 +19,11 @@
 * [删除文件夹](#删除文件夹)
 * [上传文件](#上传文件)
 * [下载文件](#下载文件)
-* [请求项目日志](#请求项目日志)
+* [列出所有依赖](#列出所有依赖)
+* [添加依赖](#添加依赖)
+* [移除依赖](#移除依赖)
 
-各API的具体文档如下：
+各Http API的具体文档如下：
 
 ## 用户注册
 
@@ -405,7 +408,7 @@
 
 ## 请求项目日志
 
-**接口：** `[POST] /project/log`
+**接口：** `[POST] /user/get-logs`
 
 **请求：** json对象，具体格式为：
 ```json
@@ -419,7 +422,7 @@
 | username | string | 用户名 |
 | projectname | string | 请求日志的项目名称 |
 
-**响应：** json对象，具体格式为：（待补充！！）
+**响应：** json对象，具体格式为：
 ```json
 {
   "code": 0,
@@ -437,5 +440,384 @@
 | code | int | 响应码（0 - 请求成功；1 - 用户名不存在；2 - 项目不存在；-1 - 未知错误） |
 | log | list | 每个元素为一条日志 |
 | log[x].code | int | 表示操作类型（0-建立项目；1-新建文件；2-新建文件夹；3-移除文件；4-移除文件夹；5-上传文件；6-下载文件；7-运行；8-调试；9-添加依赖；10-移除依赖；11-打包） |
-| log[x].time | datetime | 日志生成的时间 |
+| log[x].time | float | 日志生成的时间 |
 | log[x].extra_data | string | 日志提供的额外信息（文件名等） |
+
+## 列出所有依赖
+
+**接口：** `[POST] /project/list-dependencies`
+
+**请求：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx",
+  "project": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+| project | string | 要列出所有依赖的项目名称 |
+
+**响应：** json对象，具体格式为：
+
+```json
+{
+  "code": 0,
+  "dependencies": [
+    "xxx",
+    "yyy",
+    "zzz"
+  ]
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| code | int | 响应码（0 - 请求成功；1 - session无效；2 - 项目不存在；-1 - 未知错误） |
+| dependencies | list | 包含所有依赖名称的列表 |
+
+## 添加依赖
+
+**接口：** `[POST] /project/add-dependency`
+
+**请求：** FormData，参数为：
+
+| 名称 | 类型 | 描述 |
+| session | string | 用户Session ID |
+| project | string | 要添加依赖的项目名称 |
+| file | File | 上传的文件 |
+
+**响应：** Json对象，具体格式为：
+
+```json
+{
+  "code": 0
+}
+```
+
+| 名称 | 类型 | 描述 |
+| code | int | 响应码（0 - 请求成功；1 - session无效；2 - 项目不存在；-1 - 未知错误） |
+
+## 移除依赖
+
+**接口：** `[POST] /project/remove-dependency`
+
+**请求：** json对象，具体格式为：
+```json
+{
+  "session": "xxx",
+  "project": "xxx",
+  "dependency": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| session | string | 用户Session ID |
+| project | string | 要添加依赖的项目名称 |
+| dependency | string | 要移除的依赖名称 |
+
+**响应：** Json对象，具体格式为：
+
+```json
+{
+  "code": 0
+}
+```
+
+| 名称 | 类型 | 描述 |
+| code | int | 响应码（0 - 请求成功；1 - session无效；2 - 项目不存在；-1 - 未知错误） |
+
+各Websocket API的具体文档如下：
+
+## 运行部分
+
+**命名空间：** `/run`
+
+### 前端对后端发送：
+
+#### 开始运行
+
+**事件名：** `start`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx",
+  "project": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+| project | string | 要运行的项目名称 |
+
+#### 输入
+
+**事件名：** `input`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx",
+  "text": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+| text | string | 要输入的内容 |
+
+#### 强制停止
+
+**事件名：** `force_stop`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+
+### 后端对前端发送：
+
+#### 输出
+
+**事件名：** `output`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "text": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| text | string | 输出的内容 |
+
+## 调试部分
+
+**命名空间：** `/debug`
+
+### 前端对后端发送：
+
+#### 开始调试
+
+**事件名：** `start`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx",
+  "project": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+| project | string | 要调试的项目名称 |
+
+#### 输入
+
+**事件名：** `input`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx",
+  "text": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+| text | string | 要输入的内容 |
+
+#### 强制停止
+
+**事件名：** `force_stop`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+
+#### 添加断点
+
+**事件名：** `add_breakpoint`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx",
+  "file": "xxx",
+  "line": 1
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+| file | string | 要添加断点的文件名 |
+| line | int | 要添加断点的行号 |
+
+#### 继续运行
+
+**事件名：** `continue_running`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+
+#### 步入
+
+**事件名：** `step_in`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+
+#### 步过
+
+**事件名：** `step_pass`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+
+#### 步出
+
+**事件名：** `step_out`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+
+#### 查询变量值
+
+**事件名：** `query_value`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "session": "xxx",
+  "var": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| session | string | 用户Session ID |
+| var | string | 要查询的变量名 |
+
+### 后端对前端发送：
+
+#### 输出
+
+**事件名：** `output`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "text": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| text | string | 输出的内容 |
+
+#### 在某行停止
+
+**事件名：** `pause`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "file": "xxx",
+  "line": 1
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| file | string | 停止在的文件 |
+| line | int | 停止在的行号 |
+
+#### 返回变量值
+
+**事件名：** `var_value`
+
+**参数：** json对象，具体格式为：
+
+```json
+{
+  "var": "xxx",
+  "value": "xxx"
+}
+```
+
+| 名称 | 类型 | 描述 |
+| - | - | - |
+| var | string | 变量名 |
+| value | string | 变量值 |
