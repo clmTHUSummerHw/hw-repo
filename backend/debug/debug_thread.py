@@ -54,14 +54,12 @@ class DebugThread(Thread):
         self.last_line.append(new_byte)
         if self.last_line.endswith('\n'):
             self.handle_full_line()
-        elif self.in_init and self.last_line.endswith('> '):
-            self.handle_input()
-        elif not self.in_init and self.last_line.endswith('main[1] '):
+        elif self.last_line.endswith('main[1] '):
             self.handle_input()
 
     def run(self):
         self.debugger_process = subprocess.Popen(
-            ['jdb', '-classpath', self.main_path, 'Main'],
+            ['jdb', '-attach', self.session],
             stdin=subprocess.PIPE,
             stdout = subprocess.PIPE
         )
