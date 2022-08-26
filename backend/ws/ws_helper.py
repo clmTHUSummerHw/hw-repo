@@ -17,8 +17,8 @@ class WsHelper:
 
     def init_ws(self, ws: SocketIO) -> None:
         self.__ws = ws
-        self.__ws.on('connect_ws', connect_ws, self.namespace)
-        self.__ws.on('disconnect_ws', disconnect_ws, self.namespace)
+        self.__ws.on_event('connect_ws', connect_ws, self.namespace)
+        self.__ws.on_event('disconnect_ws', disconnect_ws, self.namespace)
         for i in self.__handlers:
             self.__ws.on_event(i, self.__handlers[i], self.namespace)
 

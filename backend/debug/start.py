@@ -1,4 +1,3 @@
-from backend.debug import debug_thread
 from debug import debug_api
 from project.utils import get_root
 from run.get_out_root import get_out_root
