@@ -61,6 +61,8 @@ export default defineComponent({
                 let result = await axios.post('/user/get-logs', jsonForm);
                 let data = result.data.log;
                 let result_list = [];
+
+                //根据code返回操作类型字符串
                 function getLogType(logcode: Number) {
                     switch(logcode) {
                         case 0: return 'PROJECT BUILD'; break;
@@ -78,6 +80,7 @@ export default defineComponent({
                         default: break;
                     }
                 }
+                
                 for (let i in data)
                 {
                     let current_log = {
