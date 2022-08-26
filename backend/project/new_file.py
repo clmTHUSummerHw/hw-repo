@@ -3,7 +3,7 @@ import os
 import re
 from typing import List
 from flask import request, jsonify
-from project.utils import split_path, get_root, check_and_make_dirs
+from project.utils import add_log_with_session, split_path, get_root, check_and_make_dirs
 
 
 file_name_re = re.compile(r'([/\\][^/\\:\*\?"<>\|\f\n\r\t\v]*[^/\\:\*\?"<>\|\f\n\r\t\v\.])+')
@@ -24,7 +24,6 @@ def new_file():
         return jsonify({'code': 3})
 
     paths = split_path(file_full)
-    file_name = paths[len(paths) - 1]
     paths.pop()
 
     code, root = get_root(session, project_name)
@@ -44,4 +43,5 @@ def new_file():
     except Exception:
         return jsonify({'code': -1})
 
+    add_log_with_session(session, project_name, 1, file_full)
     return jsonify({'code': 0})

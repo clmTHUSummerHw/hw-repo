@@ -2,7 +2,7 @@ import base64
 import os
 import re
 from flask import request, jsonify
-from project.utils import check_and_make_dirs, get_root, split_path
+from project.utils import add_log_with_session, check_and_make_dirs, get_root, split_path
 
 
 file_name_re = re.compile(r'([/\\][^/\\:\*\?"<>\|\f\n\r\t\v]*[^/\\:\*\?"<>\|\f\n\r\t\v\.])+')
@@ -54,4 +54,5 @@ def upload_file():
     except Exception:
         return jsonify({'code': -1})
 
+    add_log_with_session(session, project_name, 5, file_full)
     return jsonify({'code': 0})
