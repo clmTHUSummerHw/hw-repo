@@ -35,6 +35,7 @@ import type DownloadFileResult from '@/utils/post-util/DownloadFileResult';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import type CreateFileResult from '@/utils/post-util/CreateFileResult';
 import type ListFilesResult from '@/utils/post-util/ListFilesResult';
+import { Base64 } from 'js-base64';
 
 class Data
 {
@@ -90,7 +91,12 @@ export default defineComponent({
             if (treeNode.level > 1 && treeNode.parent != null)
             {
                 let data = treeNode.data as FileData;
-                result = this.getCurrentFilePath(treeNode.parent) + data.name;
+                let parentResult = this.getCurrentFilePath(treeNode.parent);
+
+                if(parentResult[parentResult.length - 1] != '/')
+                    result = parentResult + '/' + data.name;
+                else
+                    result = parentResult + data.name;
             }
             if (result[0] != '/')
                 result = '/' + result;
@@ -102,16 +108,16 @@ export default defineComponent({
             let path = this.getCurrentFilePath(node);
             try
             {
-                let result = await axios.post('/project/download-file', JSON.stringify({
+                let result = await axios.post('/project/download-file', {
                     session: this.userStore.session,
                     project: this.editorStore.project.name,
                     name: path
-                }));
+                });
                 let data = result.data as DownloadFileResult;
 
                 if (data.code == 0)
                 {
-                    let content = new Buffer(data.file, 'base64').toString();
+                    let content = Base64.decode(data.file);
                     this.editorStore.tab.openedTabs.set(path, {
                         active: false,
                         isFile: true,
@@ -175,10 +181,10 @@ export default defineComponent({
 
         createFileMessageBox(currentTreeNode: TreeNode)
         {
-            ElMessageBox.prompt("Please input your file name", "新建文件", {
+            ElMessageBox.prompt("请输入文件名", "新建文件", {
                 confirmButtonText: "OK",
                 cancelButtonText: "Cancel",
-                inputPattern: /^[A-Za-z0-9\\.\\_]+$/,
+                inputPattern: /([^/\\:\*\?"<>\|\f\n\r\t\v]*[^/\\:\*\?"<>\|\f\n\r\t\v\.])+/,
                 inputErrorMessage: "请输入正确的文件名",
             })
                 .then(({ value }) =>
@@ -196,10 +202,10 @@ export default defineComponent({
 
         createFolderMessageBox(currentTreeNode: TreeNode)
         {
-            ElMessageBox.prompt("Please input your folder name", "新建文件夹", {
+            ElMessageBox.prompt("请输入文件夹名", "新建文件夹", {
                 confirmButtonText: "OK",
                 cancelButtonText: "Cancel",
-                inputPattern: /^[A-Za-z0-9\\_]+$/,
+                inputPattern: /([^/\\:\*\?"<>\|\f\n\r\t\v]*[^/\\:\*\?"<>\|\f\n\r\t\v\.])+/,
                 inputErrorMessage: "请输入正确的文件夹名",
             })
                 .then(({ value }) =>
@@ -235,11 +241,11 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post("/project/new-file", JSON.stringify({
+                let result = await axios.post("/project/new-file", {
                     session: this.userStore.session, //把props里接受session发送到后端
-                    project: this.editorStore.project,
+                    project: this.editorStore.project.name,
                     name: path,
-                }));
+                });
 
                 let data = result.data as CreateFileResult;
                 if (data.code == 0)
@@ -301,11 +307,11 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post("/project/new-folder", JSON.stringify({
+                let result = await axios.post("/project/new-folder", {
                     session: this.userStore.session, //把props里接受session发送到后端
-                    project: this.editorStore.project,
+                    project: this.editorStore.project.name,
                     name: path,
-                }));
+                });
 
                 let data = result.data as CreateFileResult;
                 if (data.code == 0)
@@ -353,11 +359,11 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post("/project/delete-file", JSON.stringify({
+                let result = await axios.post("/project/delete-file", {
                     session: this.userStore.session,
-                    project: this.editorStore.project,
+                    project: this.editorStore.project.name,
                     name: path
-                }));
+                });
 
                 let data = result.data as CreateFileResult;
 
@@ -410,11 +416,11 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post("/project/delete-folder", JSON.stringify({
+                let result = await axios.post("/project/delete-folder", {
                     session: this.userStore.session,
-                    project: this.editorStore.project,
+                    project: this.editorStore.project.name,
                     name: path
-                }));
+                });
 
                 let data = result.data as CreateFileResult;
 
@@ -468,11 +474,11 @@ export default defineComponent({
                 let path = this.getCurrentFilePath(treeNode);
                 try
                 {
-                    let result = await axios.post("/project/download-file", JSON.stringify({
+                    let result = await axios.post("/project/download-file", {
                         session: this.userStore.session, //把props里接受session发送到后端
                         project: this.editorStore.project.name,
                         name: path,
-                    }));
+                    });
 
                     let data = result.data as DownloadFileResult;
 
@@ -525,10 +531,10 @@ export default defineComponent({
         {
             try
             {
-                let result = await axios.post('/project/list-files', JSON.stringify({
+                let result = await axios.post('/project/list-files', {
                     session: this.userStore.session,
-                    project: this.editorStore.project
-                }));
+                    project: this.editorStore.project.name
+                });
                 let data = result.data as ListFilesResult;
 
                 if(data.code == 0)
@@ -562,6 +568,10 @@ export default defineComponent({
     mounted()
     {
         this.refreshTree();
+        this.editorStore.$onAction(({name, store, args, after, onError}) => {
+            if(name == 'updateTree')
+                this.refreshTree();
+        })
     },
     unmounted()
     {

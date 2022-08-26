@@ -8,7 +8,7 @@ def logout(): # 释放session
 
     session = request.json['session']
 
-    if not isinstance(session): # 若request没有session，返回-1（未知错误）
+    if not isinstance(session, str): # 若request没有session，返回-1（未知错误）
         return jsonify({'code': -1})
 
     if session not in user_dict: # 如果登录名单里没找到此session，返回-1（未知错误）

@@ -8,7 +8,8 @@
                 </el-tab-pane>
             </el-tabs>
             <div class="el-tabs text-editor-container">
-                <MonacoEditor v-model="editorStore.tab.currentText" :file="activeFile" language="java" />
+                <MonacoEditor v-if="editorVisible" v-model="editorStore.tab.currentText"
+                :file="activeFile" language="java" />
             </div>
         </div>
     </el-main>
@@ -22,6 +23,7 @@ import axios from 'axios';
 import type { TabPanelName } from 'element-plus';
 import { defineComponent } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
+import { Base64 } from 'js-base64';
 
 export default defineComponent({
     components: {
@@ -30,7 +32,8 @@ export default defineComponent({
     data()
     {
         return {
-            activeTab: ""
+            activeTab: "",
+            editorVisible: true
         };
     },
     computed: {
@@ -62,12 +65,26 @@ export default defineComponent({
             content: "Welcome to Thide!"
         });
 
+        this.editorStore.$onAction(({name, store, args, after, onError}) => {
+            if(name == 'removeAllTabs')
+                for(let i of this.editorStore.tab.openedTabs)
+                    this.onTabRemove(i[0]);
+        })
+
         setTimeout(() => {this.activeTab = 'welcome';}, 100);
     },
     methods: {
         async onTabRemove(name: TabPanelName)
         {
             let tab = this.editorStore.tab.openedTabs.get(name.toString());
+
+            if(tab?.active)
+            {
+                tab.content = this.editorStore.tab.currentText;
+                this.editorStore.tab.currentText = "";
+                this.activeTab = "";
+                this.refreshEditor;
+            }
 
             if (tab == null)
             {
@@ -84,12 +101,14 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post('/project/upload-file', JSON.stringify({
+                let text = tab.content.replace(/\r\n/g, '\n');
+                console.log(text);
+                let result = await axios.post('/project/upload-file', {
                     session: this.userStore.session,
                     project: this.editorStore.project.name,
                     name: tab.name,
-                    file: new Buffer(tab.content).toString('base64')
-                }));
+                    file: Base64.encode(text)
+                });
 
                 if((result.data as UploadFileResult).code != 0)
                 {
@@ -107,6 +126,11 @@ export default defineComponent({
                 alert('Unknown error');
                 return;
             }
+        },
+        refreshEditor()
+        {
+            this.editorVisible = false;
+            setTimeout(() => {this.editorVisible = true}, 50);
         }
     },
     watch: {
@@ -123,6 +147,7 @@ export default defineComponent({
             {
                 newTab.active = true;
                 this.editorStore.tab.currentText = newTab.content;
+                this.refreshEditor();
             }
         }
     }
@@ -133,6 +158,7 @@ export default defineComponent({
 #editor-main
 {
     overflow: hidden;
+    padding: 2px;
 
     .big-container
     {

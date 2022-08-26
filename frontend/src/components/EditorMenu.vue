@@ -9,17 +9,24 @@
         <el-sub-menu index="1">
             <template #title>文件</template>
             <el-menu-item index="1-1">上传文件</el-menu-item>
+            <el-menu-item index="1-2">打包</el-menu-item>
         </el-sub-menu>
 
         <!--编辑栏目-->
         <el-sub-menu index="2">
             <template #title>编辑</template>
             <el-menu-item index="2-1">依赖管理</el-menu-item>
-            <el-menu-item index="2-2" @click="goProjectList">返回项目列表</el-menu-item>
+            <el-menu-item index="2-2">返回项目列表</el-menu-item>
+        </el-sub-menu>
+
+        <el-sub-menu index="3">
+            <template #title>运行</template>
+            <el-menu-item index="3-1">运行</el-menu-item>
+            <el-menu-item index="3-2">调试</el-menu-item>
         </el-sub-menu>
 
         <!--帮助栏目-->
-        <el-menu-item>
+        <el-menu-item index="4">
             <el-link href="README.md">帮助</el-link>
         </el-menu-item>
     </el-menu>
@@ -47,6 +54,8 @@ import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { useEditorStore } from '@/stores/editor';
 import type UploadFileResult from '@/utils/post-util/UploadFileResult';
+import { Base64 } from 'js-base64';
+import { useRunningStore } from '@/stores/running';
 
 class Data
 {
@@ -72,6 +81,10 @@ export default defineComponent({
         editorStore()
         {
             return useEditorStore();
+        },
+        runningStore()
+        {
+            return useRunningStore();
         }
     },
     methods: {
@@ -79,6 +92,14 @@ export default defineComponent({
         {
             if (key == '1-1')
                 this.openUploadFileDialog();
+            else if(key == '2-1')
+                this.gotoDependencies();
+            else if(key == '2-2')
+                this.goProjectList();
+            else if(key == '3-1')
+                this.startRunning();
+            else if(key == '3-2')
+                this.startDebugging();
         },
 
         uploadFiles()
@@ -88,6 +109,7 @@ export default defineComponent({
             {
                 this.uploadFile(file);
             }
+            this.editorStore.updateTree();
         },
 
         async uploadFile(file: File)
@@ -106,12 +128,12 @@ export default defineComponent({
                 fullPath += '/';
                 fullPath += file.name;
 
-                let result = await axios.post('/project/upload-file', JSON.stringify({
+                let result = await axios.post('/project/upload-file', {
                     session: this.userStore.session,
                     project: this.editorStore.project.name,
                     name: fullPath,
-                    file: new Buffer(text).toString('base64')
-                }));
+                    file: Base64.encode(text)
+                });
 
                 let data = result.data as UploadFileResult;
                 if(data.code != 0)
@@ -144,7 +166,21 @@ export default defineComponent({
         },
         goProjectList()
         {
+            this.editorStore.removeAllTabs();
+            this.editorStore.project.name = "";
             this.$router.push('/project-list');
+        },
+        gotoDependencies()
+        {
+            this.$router.push('/dependency-list');
+        },
+        startRunning()
+        {
+            this.runningStore.runCommandTriggered = true;
+        },
+        startDebugging()
+        {
+            this.runningStore.debugCommandTriggered = true;
         }
     }
 })

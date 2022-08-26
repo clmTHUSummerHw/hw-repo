@@ -12,7 +12,7 @@
                     <a v-if="isLogin"> {{ userStore.username }} </a>
                     <a v-else> - </a>
 
-                    <a>登录状态: </a>
+                    <a>&emsp;登录状态: </a>
                     <el-tag class="ml-2" type="success" v-if="isLogin">已登录</el-tag>
                     <el-tag class="ml-2" type="danger" v-else>未登录</el-tag>
                 </div>
@@ -21,19 +21,25 @@
 
             <el-main>
                 <!--展示项目包含项目列表的表格-->
-                <el-table :data="projectData" style="width: 100%">
-
-                    <el-table-column label="项目名称"></el-table-column>
-                    <el-table-column label="项目创建时间"></el-table-column>
-                    <el-table-column label="项目路径"></el-table-column>
-
+                <el-table :data="userStore.projectList.value" style="width: 100%" height="80%">
+                    <el-table-column label="项目名称">
+                        <template #default="scope">
+                            <span>{{ scope.row }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                        <template #default="scope">
+                            <el-button size="small" @click="handleOpenProject(scope.row)">打开</el-button>
+                            <el-button size="small" type="danger" @click="handleDeleteProject(scope.row)">删除</el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
             </el-main>
 
             <el-footer>
                 <!--创建项目按钮区域-->
-                <el-button type="primary">创建远程项目</el-button>
-                <el-button type="primary">创建本地项目</el-button>
+                <el-button type="primary" @click="handleCreateProject">创建项目</el-button>
+                <el-button type="danger" @click="handleLogout">退出登录</el-button>
             </el-footer>
         </el-container>
     </div>
@@ -42,27 +48,192 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { useUserStore } from "@/stores/user";
+import axios from "axios";
+import type ListProjectsResult from "@/utils/post-util/ListProjectsResult";
+import { useEditorStore } from "@/stores/editor";
+import type ListFilesResult from "@/utils/post-util/ListFilesResult";
+import type CreateFileResult from "@/utils/post-util/CreateFileResult";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 export default defineComponent({
     name: "ProjectList",
-    data()
-    {
-        return {
-            isLogin: false, //是否为注册过的用户
-            projectData: [] //table中项目信息
-        }
-    },
-
     computed: {
         userStore()
         {
             return useUserStore();
+        },
+        editorStore()
+        {
+            return useEditorStore();
+        },
+        isLogin()
+        {
+            return useUserStore().session != "";
         }
     },
+    methods: {
+        async updateProjects()
+        {
+            if(!this.isLogin)
+                return;
 
-    mounted() //如需要使用async，直接把这里改为async mounted()
+            try
+            {
+                let result = await axios.post('/user/list-projects', {session: this.userStore.session});
+                let data = result.data as ListProjectsResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+
+                this.userStore.projectList.value = data.projects;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        },
+        async handleOpenProject(name: string)
+        {
+            if(!this.isLogin)
+                return;
+
+            try
+            {
+                this.editorStore.project.name = name;
+                let result = await axios.post('/project/list-files', {
+                    session: this.userStore.session,
+                    project: name
+                });
+
+                let data = result.data as ListFilesResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+                this.editorStore.tree.data = [{
+                    folder: 1,
+                    name: name,
+                    files: data.files
+                }];
+
+                this.$router.push('/editor');
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        },
+        async handleDeleteProject(name: string)
+        {
+            try
+            {
+                let result = await axios.post('/user/delete-project', {
+                    session: this.userStore.session,
+                    name: name
+                });
+
+                let data = result.data as CreateFileResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+
+                await this.updateProjects();
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        },
+        async createProject(name: string)
+        {
+            try
+            {
+                let result = await axios.post('/user/new-project', {
+                    session: this.userStore.session,
+                    name: name
+                });
+
+                let data = result.data as CreateFileResult;
+
+                if(data.code != 0)
+                {
+                    alert('未知错误');
+                    console.log('Code: ' + data.code);
+                    return;
+                }
+
+                await this.updateProjects();
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        },
+        handleCreateProject()
+        {
+            ElMessageBox.prompt("请输入项目名称", "新建项目", {
+                confirmButtonText: "OK",
+                cancelButtonText: "Cancel",
+                inputPattern: /\w{1,256}/,
+                inputErrorMessage: "项目名称只能由字母，数字和下划线组成",
+            })
+                .then(({ value }) =>
+                {
+                    this.createProject(value);
+                })
+                .catch(() =>
+                {
+                    ElMessage({
+                        type: "info",
+                        message: "Input canceled",
+                    });
+                });
+        },
+        async handleLogout()
+        {
+            try
+            {
+                let result = await axios.post('/user/logout', {
+                    session: this.userStore.session
+                });
+
+                let data = result.data as CreateFileResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+
+                this.userStore.session = '';
+                this.$router.push('/');
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        }
+    },
+    mounted()
     {
-        //TODO: 加载用户信息及项目信息（从pinia加载一部分，通过post请求获得另一部分）（尽量使用async，不要嵌套回调函数）
+        this.updateProjects();
     }
 })
 </script>

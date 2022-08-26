@@ -1,4 +1,4 @@
 CREATE USER IF NOT EXISTS flask IDENTIFIED BY '123456';
+DROP DATABASE IF EXISTS flask;
 CREATE DATABASE IF NOT EXISTS flask;
 GRANT ALL ON flask.* TO 'flask'@'%' IDENTIFIED BY '123456';
-SELECT concat('DROP TABLE IF EXISTS ', table_name, ';') FROM information_schema.tables WHERE table_schema = 'flask';

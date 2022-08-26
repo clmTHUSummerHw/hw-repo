@@ -5,7 +5,7 @@ import datetime
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True)
-    password = db.Column(db.String(64))
+    password = db.Column(db.String(32))
     def __init__(self, username, password) -> None:
         super().__init__()
         self.username = username
@@ -17,6 +17,7 @@ class User(db.Model):
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(256))
+    create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     user = db.relationship('User', backref=db.backref('projects', lazy='dynamic'))
 
@@ -40,7 +41,7 @@ class Log(db.Model):
     # code为2或4时：文件夹名
     # code为9或10时：依赖文件名
     # 其他code：空字符串
-    extra_data = db.Column(db.String(65536))
+    extra_data = db.Column(db.String(1024))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # 获得项目对象（假设名为obj）时，使用obj.log即可查看与其相关的日志

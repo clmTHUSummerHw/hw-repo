@@ -1,22 +1,21 @@
 import { defineStore } from 'pinia'
 
+class ProjectList
+{
+    value: string[] = []
+}
+
 export const useUserStore = defineStore({
     id: 'user',
     state()
     {
         return {
             username: "",
-            session: ""
+            session: "",
+            projectList: new ProjectList()
         }
     },
-    actions: {
-        setUsername(username: string)
-        {
-            this.username = username;
-        },
-        setSession(session: string)
-        {
-            this.session = session;
-        }
+    persist: {
+        enabled: true
     }
 })

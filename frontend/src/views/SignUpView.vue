@@ -47,6 +47,7 @@ import { defineComponent } from 'vue';
 import { validateUsername, validatePassword, validatePasswordCheck } from '@/utils/validators';
 import type { FormInstance } from 'element-plus/es/components/form/index';
 import type RegisterResult from '@/utils/post-util/RegisterResult';
+import md5 from 'js-md5';
 
 export default defineComponent({
     name: 'SignUpView',
@@ -96,8 +97,22 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post('/user/register', JSON.stringify(this.form)) as RegisterResult;
-                //TODO: 处理请求结果
+                let hash = md5.update(this.form.password).hex();
+                console.log(hash);
+                let result = await axios.post('/user/register', {
+                    username: this.form.username,
+                    password: hash
+                });
+                let data = result.data as RegisterResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+
+                alert('注册成功！');
+                this.$router.push('/');
                 return;
             }
             catch (e)

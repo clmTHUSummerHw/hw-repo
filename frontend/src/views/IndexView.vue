@@ -39,6 +39,9 @@ import type { FormInstance } from 'element-plus/es/components/form/index';
 import { defineComponent } from 'vue';
 import type LoginResult from '@/utils/post-util/LoginResult';
 import { validateUsername, validatePassword } from '@/utils/validators';
+import { useUserStore } from '@/stores/user';
+import md5 from 'js-md5';
+import type RegisterResult from '@/utils/post-util/RegisterResult';
 
 export default defineComponent({
     name: 'IndexView',
@@ -60,6 +63,12 @@ export default defineComponent({
             }
         };
     },
+    computed: {
+        userStore()
+        {
+            return useUserStore();
+        }
+    },
     methods: {
         async submitForm()
         {
@@ -75,8 +84,23 @@ export default defineComponent({
 
             try
             {
-                let result = await axios.post('/user/login', JSON.stringify(this.form)) as LoginResult;
-                //TODO: 处理请求结果，用户名和session保存在pinia中
+                let hash = md5.update(this.form.password).hex();
+                let result = await axios.post('/user/login', {
+                    username: this.form.username,
+                    password: hash
+                });
+                let data = result.data as LoginResult;
+                if(data.code != 0)
+                {
+                    console.log('code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+                this.userStore.username = this.form.username;
+                this.userStore.session = data.session;
+                console.log(data.session);
+                alert('登录成功！');
+                this.$router.push('/project-list');
                 return;
             }
             catch (e)
