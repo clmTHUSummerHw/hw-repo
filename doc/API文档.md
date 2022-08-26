@@ -429,12 +429,14 @@
 ```
 | 名称 | 类型 | 描述 |
 | - | - | - |
-| code | int | 响应码（0 - 注册成功）|
+| code | int | 响应码（0 - 请求成功）|
 | projects | list | 每个元素为一个项目 |
 | projects[x].projectUsername | string | 拥有项目的用户名 |
 | projects[x].projectName | string | 项目名 |
 | projects[x].projectCreateDate | string | 项目创建时间戳（单位为ms） |
 | projects[x].projectDirectory | string | 项目根目录绝对路径 |
+
+**注意：** 由于无请求参数，且目前后台没有项目时返回空projects列表也属于正常情况，故响应码只有一种情况——请求成功。
 
 ## 请求项目日志
 
