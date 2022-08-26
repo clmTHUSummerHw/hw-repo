@@ -8,4 +8,4 @@ def input(data): #TODO: 获取输入，并传递给对应用户的项目 / data:
     inputText = data.text
 
     currentThread = running_users[session]
-    currentThread.communicate(inputText)
+    currentThread.setInput(inputText) #传入输入
