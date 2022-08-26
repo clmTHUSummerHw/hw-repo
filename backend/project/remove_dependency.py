@@ -1,6 +1,6 @@
 import os
 from flask import request, jsonify
-from project.utils import get_dependency_root
+from project.utils import add_log_with_session, get_dependency_root
 
 
 def remove_dependency():
@@ -20,6 +20,7 @@ def remove_dependency():
 
     try:
         os.remove(root + '/' + dependency_name)
+        add_log_with_session(session, project_name, 10, dependency_name)
         return jsonify({'code': 0})
     except Exception:
         return jsonify({'code': 3})

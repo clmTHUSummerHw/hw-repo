@@ -1,5 +1,5 @@
 from debug import debug_api
-from project.utils import get_root
+from project.utils import add_log_with_session, get_root
 from run.get_out_root import get_out_root
 from run.run_thread import RunThread
 from debug.debug_thread import DebugThread
@@ -28,3 +28,4 @@ def start(data):
     debugging_projects[session] = DebuggingProject(run_thread, debug_thread)
     run_thread.start()
     debug_thread.start()
+    add_log_with_session(session, project, 8, '')

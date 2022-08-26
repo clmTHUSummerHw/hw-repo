@@ -2,7 +2,7 @@ import base64
 import os
 from flask import request, jsonify
 
-from project.utils import get_root
+from project.utils import add_log_with_session, get_root
 
 
 def download_file():
@@ -34,6 +34,7 @@ def download_file():
         content = f.read()
         f.close()
         out = base64.b64encode(content.encode()).decode()
+        add_log_with_session(session, project_name, 6, file_full)
         return jsonify({'code': 0, 'file': out})
     except Exception:
         return jsonify({'code': -1, 'file': ''})

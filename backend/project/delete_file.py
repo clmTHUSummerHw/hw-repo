@@ -1,7 +1,7 @@
 import os
 from flask import request, jsonify
 
-from project.utils import get_root
+from project.utils import add_log_with_session, get_root
 
 
 def delete_file():
@@ -33,4 +33,5 @@ def delete_file():
     except Exception:
         return jsonify({'code': -1})
 
+    add_log_with_session(session, project_name, 3, file_full)
     return jsonify({'code': 0})
