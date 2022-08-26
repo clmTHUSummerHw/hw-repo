@@ -82,7 +82,7 @@ export default defineComponent({
         },
     },
     methods: {
-        async onFileUpload(file: UploadFile, files: UploadFiles)
+        async onFileUpload(file: UploadFile, _files: UploadFiles)
         {
             if (file.raw == null)
                 return;
