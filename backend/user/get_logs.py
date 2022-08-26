@@ -2,15 +2,18 @@ import re
 from flask import request, jsonify
 from db.models import User, Log
 from db import db
+from db.models import Log
 
 def get_logs():
     if not request.is_json: # 若传入的不是json对象，返回-1（未知错误）
+        print('not an instance!')
         return jsonify({'code': -1, 'log': []})
 
     username = request.json['username']
     projectname = request.json['projectname']
 
     if not isinstance(username, str) or not isinstance(projectname, str): # 若request没有username或projectname，返回-1（未知错误）
+        print('more info!')
         return jsonify({'code': -1, 'log': []})
 
     user = User.query.filter_by(username=username).first()
@@ -26,7 +29,7 @@ def get_logs():
     for log in project.log.order_by(Log.time.desc()).all():
         alone = {}
         alone['code'] = log.code
-        alone['time'] = log.time
+        alone['time'] = log.time.timestamp()*1000
         alone['extra_data'] = log.extra_data
         logs.append(alone)
 

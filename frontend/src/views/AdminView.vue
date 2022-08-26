@@ -39,54 +39,44 @@
 import axios from "axios";
 import { defineComponent } from "vue";
 
+class Data {
+    projectData: { projectUsername: any; projectName: any; projectCreateDate: any; projectDirectory: any; }[] = []
+}
+
 export default defineComponent({
     name: "AdminPage",
-    data()
-    {
-        return {
-            projectData: [ //随便搞两个测试数据
-                {
-                    projectUsername: 'Richard',
-                    projectName: 'TEST-PROJECT1',
-                    projectCreateDate: '2022-08-22',
-                    projectDirectory: 'C:\\Richard\\Tsinghua\\2021-2022夏1',
-                    projectLog: 'projectLog1'
-                },
-                {
-                    projectUsername: 'Richard',
-                    projectName: 'TEST-PROJECT2',
-                    projectCreateDate: '2022-08-23',
-                    projectDirectory: 'C:\\Richard\\Tsinghua\\2021-2022夏2',
-                    projectLog: 'projectLog2'
-                }
-            ] //table中项目信息
-        }
+    data() {
+        return new Data()
     },
 
     methods: {
-        getLog(row: any) {
-            let jsonForm = JSON.stringify({
-                username: row.projectUsername,
-                projectname: row.projectName
-            });
-            /*
-            try {
-                axios.post('/project/log', jsonForm);
-            }
-            catch(e) {
-                console.log(e);
-                //TODO: 处理错误情况
-            }
-             */
-            //没有后端代码，暂时不用POST方法，此后再使用这段代码
+        async getLog(row: any) {
             this.$router.push({
-                name:"projectLog",
+                name:"projectLog", 
                 params: {
-                    username:row.projectUsername,
+                    username:row.projectUsername, 
                     projectName: row.projectName
                 }
             });
+            
+        },
+        async updateTable() {
+            try
+            {
+                let result = await axios.post('/user/get-all-project');
+                let data = result.data.projects;
+                this.projectData = data;
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
         }
+    },
+    mounted() {
+        this.updateTable()
     }
 })
 </script>
