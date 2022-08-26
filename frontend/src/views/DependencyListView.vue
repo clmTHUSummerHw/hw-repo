@@ -15,19 +15,31 @@
             <el-main class="view-main">
                 <el-row class="full-height">
                     <el-col :span="12" class="full-height table-container">
-                        <el-table height="calc(100% - 32px)" width="100%">
-                            <!-- TODO: 设计表格，应包含依赖文件名与删除按钮 -->
+                        <el-table :data="dependencies" height="calc(100% - 32px)" width="100%">
+                            <el-table-column label="依赖名称">
+                                <template #default="scope">
+                                    <span>{{ scope.row }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作">
+                                <template #default="scope">
+                                    <el-button size="small" type="danger" @click="handleDeleteDependency(scope.row)">删除
+                                    </el-button>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </el-col>
                     <el-col :span="12" class="full-height">
-                        <el-upload drag @change="onFileUpload"><!-- TODO: 处理上传操作 -->
-                            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                        <el-upload drag @change="onFileUpload">
+                            <el-icon class="el-icon--upload">
+                                <upload-filled />
+                            </el-icon>
                             <div class="el-upload__text">
                                 Drop file here or <em>click to upload</em>
                             </div>
                         </el-upload>
                         <el-row>
-                            <el-button>返回编辑器</el-button>
+                            <el-button @click="gotoEditor">返回编辑器</el-button>
                         </el-row>
                     </el-col>
                 </el-row>
@@ -43,6 +55,8 @@ import { defineComponent } from 'vue';
 import { UploadFilled } from '@element-plus/icons-vue';
 import type { UploadFile, UploadFiles } from 'element-plus';
 import axios from 'axios';
+import type UploadFileResult from '@/utils/post-util/UploadFileResult';
+import type ListDependenciesResult from '@/utils/post-util/ListDependenciesResult';
 
 class Data
 {
@@ -70,7 +84,7 @@ export default defineComponent({
     methods: {
         async onFileUpload(file: UploadFile, files: UploadFiles)
         {
-            if(file.raw == null)
+            if (file.raw == null)
                 return;
             try
             {
@@ -79,13 +93,82 @@ export default defineComponent({
                 formData.append('project', this.editorStore.project.name);
                 formData.append('file', file.raw, file.name);
                 let result = await axios.post('/project/add-dependency', formData);
+                let data = result.data as UploadFileResult;
+                if (data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+                else
+                {
+                    await this.updateTable();
+                    return;
+                }
+            }
+            catch (e)
+            {
+                console.log(e);
+                return;
+            }
+        },
+        async updateTable()
+        {
+            try
+            {
+                let result = await axios.post('/project/list-dependencies', {
+                    session: this.userStore.session,
+                    project: this.editorStore.project.name
+                });
+                let data = result.data as ListDependenciesResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+                this.dependencies = data.dependencies;
+                return;
             }
             catch(e)
             {
                 console.log(e);
                 return;
             }
+        },
+        async handleDeleteDependency(name: string)
+        {
+            try
+            {
+                let result = await axios.post('/project/remove-dependency', {
+                    session: this.userStore.session,
+                    project: this.editorStore.project.name,
+                    dependency: name
+                });
+                let data = result.data as UploadFileResult;
+                if(data.code != 0)
+                {
+                    console.log('Code: ' + data.code);
+                    alert('未知错误');
+                    return;
+                }
+                await this.updateTable();
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
+        },
+        gotoEditor()
+        {
+            this.$router.push('/editor');
         }
+    },
+    mounted()
+    {
+        this.updateTable();
     }
 })
 </script>
@@ -128,6 +211,7 @@ export default defineComponent({
         width: 100%;
         background-color: #A0D0FF;
         border-bottom: 1px solid var(--el-border-color);
+
         .el-row
         {
             line-height: var(--el-header-height);
@@ -148,6 +232,7 @@ export default defineComponent({
     {
         height: calc(100% - 64px);
         padding: 0px;
+
         .el-col
         {
             padding: 16px;

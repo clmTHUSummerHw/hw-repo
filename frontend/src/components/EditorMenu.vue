@@ -56,7 +56,6 @@ import { useEditorStore } from '@/stores/editor';
 import type UploadFileResult from '@/utils/post-util/UploadFileResult';
 import { Base64 } from 'js-base64';
 import { useRunningStore } from '@/stores/running';
-import WSConnector from '@/utils/ws-util/WsConnector';
 
 class Data
 {
@@ -95,7 +94,7 @@ export default defineComponent({
                 this.openUploadFileDialog();
             else if(key == '2-1')
                 this.gotoDependencies();
-            else if(key == '2.2')
+            else if(key == '2-2')
                 this.goProjectList();
             else if(key == '3-1')
                 this.startRunning();
