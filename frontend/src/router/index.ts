@@ -5,6 +5,7 @@ import ProjectListView from '@/views/ProjectListView.vue'
 import EditorView from '@/views/EditorView.vue'
 import AdminPageView from '@/views/AdminView.vue'
 import ProjectLogView from '@/views/ProjectLogView.vue'
+import DependencyListView from '@/views/DependencyListView.vue'
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -38,6 +39,11 @@ const router = createRouter({
             path: '/log/:username/:projectName',
             name: 'projectLog',
             component: ProjectLogView
+        },
+        {
+            path: '/dependency-list',
+            name: 'dependency_list',
+            component: DependencyListView
         }
     ]
 })

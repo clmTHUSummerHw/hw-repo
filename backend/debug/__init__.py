@@ -1,5 +1,6 @@
 from ws.ws_helper import WsHelper
 
+from debug.prepare import prepare
 from debug.start import start
 from debug.input import input
 from debug.force_stop import force_stop
@@ -14,6 +15,7 @@ from debug.query_value import query_value
 
 debug_api = WsHelper('/debug')
 
+debug_api.on_event('prepare', prepare)
 debug_api.on_event('start', start)
 debug_api.on_event('input', input)
 debug_api.on_event('force_stop', force_stop)

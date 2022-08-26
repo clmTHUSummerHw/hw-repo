@@ -77,7 +77,7 @@ export default defineComponent({
 
         //创建editor实例
         let container = this.$refs['editor-container'] as HTMLElement;
-        editor = monaco.editor.create(container, { language: this.language, glyphMargin: true });
+        editor = monaco.editor.create(container, { language: this.language, glyphMargin: true, });
 
         //监听鼠标事件和内容改变事件
         editor.onMouseUp(this.onEditorMouseUp, this);
@@ -112,7 +112,7 @@ export default defineComponent({
                 let t1 = text.substring(0, change.rangeOffset);
                 let t2 = change.text;
                 let t3 = text.substring(change.rangeOffset + change.rangeLength, text.length);
-
+                console.log(t1 + t2 + t3);
                 //更新modelValue属性
                 this.emitUpdate(t1 + t2 + t3);
             }
