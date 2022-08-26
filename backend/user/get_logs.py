@@ -1,6 +1,6 @@
 import re
 from flask import request, jsonify
-from db.models import User
+from db.models import User, Log
 from db import db
 
 def get_logs():
@@ -23,11 +23,11 @@ def get_logs():
         return jsonify({'code': 2, 'log': []})
 
     logs = []
-    for log in project.log.all():
+    for log in project.log.order_by(Log.time.desc()).all():
         alone = {}
         alone['code'] = log.code
         alone['time'] = log.time
         alone['extra_data'] = log.extra_data
         logs.append(alone)
 
-    return jsonify({'code': 0, 'log': logs}) # 返回0（返回项目日志） 
+    return jsonify({'code': 0, 'log': logs}) # 返回0（返回项目日志）
