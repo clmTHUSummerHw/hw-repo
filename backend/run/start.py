@@ -1,6 +1,6 @@
 from run.running_users import running_users, RunningUser
 from run.run_thread import RunThread
-from project.utils import get_root
+from project.utils import add_log_with_session, get_root
 from run.get_out_root import get_out_root
 from run import run_api
 
@@ -25,3 +25,4 @@ def start(data): #TODO: 在一个新的线程中运行项目，并实时提供�
     start_project = RunThread(root, class_root, data.session, run_api)
     running_users[data.session] = RunningUser(start_project)
     start_project.start()
+    add_log_with_session(session, project, 7, '')

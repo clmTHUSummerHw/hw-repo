@@ -2,7 +2,7 @@ import os
 import re
 from typing import List
 from flask import request, jsonify
-from project.utils import split_path, get_root, check_and_make_dirs
+from project.utils import add_log_with_session, split_path, get_root, check_and_make_dirs
 
 
 file_name_re = re.compile(r'([/\\][^/\\:\*\?"<>\|\f\n\r\t\v]*[^/\\:\*\?"<>\|\f\n\r\t\v\.])+')
@@ -42,4 +42,5 @@ def new_folder():
     except Exception:
         return jsonify({'code': -1})
 
+    add_log_with_session(session, project_name, 2, file_full)
     return jsonify({'code': 0})
