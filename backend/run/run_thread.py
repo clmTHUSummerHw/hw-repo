@@ -41,9 +41,13 @@ class RunThread(threading.Thread):
         self.ws.emit(self.user_session, 'output', {'text': last_outputs.decode()})
         self.ws.emit(self.user_session, 'run_complete')
         #子进程结束
+<<<<<<< HEAD
         if not self.debug:
             del running_users[self.user_session]
         else:
             del debugging_projects[self.user_session]
 
 
+=======
+        del running_users[self.user_session]
+>>>>>>> macchiato

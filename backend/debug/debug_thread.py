@@ -7,7 +7,7 @@ from typing import Optional
 from ws.ws_helper import WsHelper
 
 
-line_re = re.compile(r'行=([0-9]+) bci=[0-9]+')
+line_re = re.compile(r'(\w+)\.(\w+)\(\), 行=([0-9]+) bci=[0-9]+')
 var_re = re.compile(r'([\w]+) = (.+)')
 
 
@@ -29,8 +29,9 @@ class DebugThread(Thread):
         try_line = line_re.search(to_handle)
 
         if try_line:
-            line = try_line.group(1)
-            self.ws.emit(self.session, 'stop_at_line', {'line': int(line)})
+            file = try_line.group(1)
+            line = try_line.group(3)
+            self.ws.emit(self.session, 'pause', {'file': file, 'line': int(line)})
 
         try_var = var_re.search(to_handle)
         if try_var:

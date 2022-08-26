@@ -134,9 +134,18 @@ export default defineComponent({
         {
             this.runningStore.debuggerStatus.currentFile = data.file;
             this.runningStore.debuggerStatus.currentLine = data.line;
+            for(let i of this.runningStore.debuggerStatus.variables)
+            {
+                this.ws?.emit('query_value', i.name)
+            }
         },
         onVarValue(data: any)
         {
+            for(let i of this.runningStore.debuggerStatus.variables)
+            {
+                if(data['var'] == i.name)
+                    i.value = data.value
+            }
         }
     },
     mounted()

@@ -1,4 +1,3 @@
-import json
 from run.run_thread import RunThread
 from project.utils import get_root
 from run.running_users import running_users, RunningUser

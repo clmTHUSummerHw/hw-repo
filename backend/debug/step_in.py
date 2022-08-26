@@ -1,2 +1,11 @@
+from debug.debugging_projects import debugging_projects
+
+
 def step_in(data):
-    pass # 调试器执行步入操作
+    session = data['session']
+    if not isinstance(session, str):
+        return
+
+    debugging_project = debugging_projects[session]
+    debug_thread = debugging_project.debug_thread
+    debug_thread.input_queue.put('step')
