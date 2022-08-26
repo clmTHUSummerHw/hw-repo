@@ -14,16 +14,14 @@ var_re = re.compile(r'([\w]+) = (.+)')
 class DebugThread(Thread):
     debugger_process: Optional[subprocess.Popen] = None
     session: str = ''
-    main_path: str = '.'
     last_line: bytearray = bytearray()
     in_init: bool = True
     input_queue: Queue[str] = Queue()
     ws: WsHelper
 
-    def __init__(self, session: str, main_path: str, ws: WsHelper) -> None:
+    def __init__(self, session: str, ws: WsHelper) -> None:
         super().__init__()
         self.session = session
-        self.main_path = main_path
         self.ws = ws
 
     def handle_full_line(self):
@@ -52,12 +50,13 @@ class DebugThread(Thread):
 
     def handle_new_byte(self, new_byte: int):
         self.last_line.append(new_byte)
-        if self.last_line.endswith('\n'):
+        if self.last_line.endswith(b'\n'):
             self.handle_full_line()
-        elif self.last_line.endswith('main[1] '):
+        elif self.last_line.endswith(b'main[1] '):
             self.handle_input()
 
     def run(self):
+        time.sleep(0.1)
         self.debugger_process = subprocess.Popen(
             ['jdb', '-attach', self.session],
             stdin=subprocess.PIPE,
