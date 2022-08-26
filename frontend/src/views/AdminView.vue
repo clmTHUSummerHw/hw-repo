@@ -39,37 +39,49 @@
 import axios from "axios";
 import { defineComponent } from "vue";
 
+class Data {
+    
+}
+axios.post('/user/get-all-project')
+.then((res) => {
+    result = res.data.projects;
+});
+
 export default defineComponent({
     name: "AdminPage",
-    data()
-    {
+    data() {
         return {
-            projectData: [ //随便搞两个测试数据
-                {
-                    projectUsername: 'Richard',
-                    projectName: 'TEST-PROJECT1',
-                    projectCreateDate: '2022-08-22',
-                    projectDirectory: 'C:\\Richard\\Tsinghua\\2021-2022夏1',
-                    projectLog: 'projectLog1'
-                },
-                {
-                    projectUsername: 'Richard',
-                    projectName: 'TEST-PROJECT2',
-                    projectCreateDate: '2022-08-23',
-                    projectDirectory: 'C:\\Richard\\Tsinghua\\2021-2022夏2',
-                    projectLog: 'projectLog2'
+            
+        }
+    },
+    computed: {
+        projectData() {
+            console.log('go');
+            
+            console.log(result);
+            let project_obj_list = [];
+            for (let i in result) {
+                let current_project_obj = {
+                    projectUsername: result[i].projectUsername,
+                    projectName: result[i].projectName,
+                    projectCreateDate: result[i].projectCreateDate,
+                    projectDirectory: result[i].projectDirectory
                 }
-            ] //table中项目信息
+                project_obj_list.push(current_project_obj);
+            }
+            
+            return project_obj_list
         }
     },
 
     methods: {
         getLog(row: any) {
+            /*
             let jsonForm = JSON.stringify({
                 username: row.projectUsername,
                 projectname: row.projectName
             });
-            /*
+            
             try {
                 axios.post('/project/log', jsonForm);
             }
@@ -80,9 +92,9 @@ export default defineComponent({
              */
             //没有后端代码，暂时不用POST方法，此后再使用这段代码
             this.$router.push({
-                name:"projectLog",
+                name:"projectLog", 
                 params: {
-                    username:row.projectUsername,
+                    username:row.projectUsername, 
                     projectName: row.projectName
                 }
             });

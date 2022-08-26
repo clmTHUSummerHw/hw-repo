@@ -18,6 +18,17 @@ def get_root(session: str, project_name: str) -> Tuple[int, str]:
     root = './project_storage/' + username + '/' + project_name
     return 0, root
 
+def get_root_for_admin(user_name: str, project_name: str) -> str:
+    username_list = []
+    for user in user_dict.values():
+        username_list.append(user.username)
+
+    user = User.query.filter_by(username=user_name).first()
+    project = user.projects.filter_by(name=project_name).first()
+
+    root = './project_storage/' + user_name + '/' + project_name
+    return root
+
 
 def get_dependency_root(session: str, project_name: str) -> Tuple[int, str]:
     if session not in user_dict:
