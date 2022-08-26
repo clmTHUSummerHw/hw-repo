@@ -40,57 +40,17 @@ import axios from "axios";
 import { defineComponent } from "vue";
 
 class Data {
-    
+    projectData: { projectUsername: any; projectName: any; projectCreateDate: any; projectDirectory: any; }[] = []
 }
-axios.post('/user/get-all-project')
-.then((res) => {
-    result = res.data.projects;
-});
 
 export default defineComponent({
     name: "AdminPage",
     data() {
-        return {
-            
-        }
-    },
-    computed: {
-        projectData() {
-            console.log('go');
-            
-            console.log(result);
-            let project_obj_list = [];
-            for (let i in result) {
-                let current_project_obj = {
-                    projectUsername: result[i].projectUsername,
-                    projectName: result[i].projectName,
-                    projectCreateDate: result[i].projectCreateDate,
-                    projectDirectory: result[i].projectDirectory
-                }
-                project_obj_list.push(current_project_obj);
-            }
-            
-            return project_obj_list
-        }
+        return new Data()
     },
 
     methods: {
-        getLog(row: any) {
-            /*
-            let jsonForm = JSON.stringify({
-                username: row.projectUsername,
-                projectname: row.projectName
-            });
-            
-            try {
-                axios.post('/project/log', jsonForm);
-            }
-            catch(e) {
-                console.log(e);
-                //TODO: 处理错误情况
-            }
-             */
-            //没有后端代码，暂时不用POST方法，此后再使用这段代码
+        async getLog(row: any) {
             this.$router.push({
                 name:"projectLog", 
                 params: {
@@ -98,7 +58,25 @@ export default defineComponent({
                     projectName: row.projectName
                 }
             });
+            
+        },
+        async updateTable() {
+            try
+            {
+                let result = await axios.post('/user/get-all-project');
+                let data = result.data.projects;
+                this.projectData = data;
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
         }
+    },
+    mounted() {
+        this.updateTable()
     }
 })
 </script>

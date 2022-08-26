@@ -32,21 +32,70 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import axios from "axios";
+
+class Data {
+    logData: {logDatetime: any; logContent: any; logObject: any;}[] = []
+}
 
 export default defineComponent({
     name: "LogPage",
     data()
     {
-        return {
-            logData: [
-
-            ] //table中项目信息
-        }
+        return new Data()
     },
 
     methods: {
         goAdmin() {
             this.$router.push({name:'admin'});
+        },
+        async updateTable() {
+            try
+            {
+                let username = this.$route.params.username;
+                let projectName = this.$route.params.projectName;
+                let jsonForm = {
+                    'username': username,
+                    'projectname': projectName
+                }
+                let result = await axios.post('/user/get-logs', jsonForm);
+                let data = result.data.log;
+                let result_list = [];
+                function getLogType(logcode: Number) {
+                    switch(logcode) {
+                        case 0: return 'PROJECT BUILD'; break;
+                        case 1: return 'NEW FILE'; break;
+                        case 2: return 'NEW FOLDER'; break;
+                        case 3: return 'DELETE FILE'; break;
+                        case 4: return 'DELETE FOLDER'; break;
+                        case 5: return 'FILE UPLOAD'; break;
+                        case 6: return 'FILE DOWNLOAD'; break;
+                        case 7: return 'RUN PROJECT'; break;
+                        case 8: return 'DEBUG PROJECT'; break;
+                        case 9: return 'DEPENDENCY ADDED'; break;
+                        case 10: return 'DEPENDENCY REMOVED'; break;
+                        case 11: return 'PACKED UP'; break;
+                        default: break;
+                    }
+                }
+                for (let i in data)
+                {
+                    let current_log = {
+                        logDatetime: new Date(data[i].time),
+                        logContent: getLogType(data[i].code),
+                        logObject: data[i].extra_data
+                    }
+                    result_list.push(current_log);
+                    console.log(current_log);
+                }
+                this.logData = result_list;
+                return;
+            }
+            catch(e)
+            {
+                console.log(e);
+                return;
+            }
         }
     },
     computed: {
@@ -59,6 +108,9 @@ export default defineComponent({
         getOperation() {
             //TODO: 根据相应中log[x].code输出字符串形式的操作内容
         }
+    },
+    mounted() {
+        this.updateTable();
     }
 })
 </script>
